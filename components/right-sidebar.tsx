@@ -14,7 +14,7 @@ interface RightSidebarProps {
 
 export function RightSidebar({ trendingArticles }: RightSidebarProps) {
   return (
-    <aside className="hidden lg:block lg:w-80 lg:sticky lg:top-20 lg:h-fit">
+    <aside className="hidden ml-12 lg:block  lg:w-86 lg:sticky lg:top-20 lg:h-fit">
       <div className="space-y-6">
         {/* Trending Section */}
         <div className="bg-card rounded-lg border border-border shadow-md p-6">
@@ -31,7 +31,7 @@ export function RightSidebar({ trendingArticles }: RightSidebarProps) {
                 className="block group pb-4 border-b border-border last:border-b-0 hover:opacity-75 transition-opacity"
               >
                 <div className="flex gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-bold text-sm">
+                  <div className="shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-bold text-sm">
                     {index + 1}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -59,7 +59,7 @@ export function RightSidebar({ trendingArticles }: RightSidebarProps) {
         </div>
 
         {/* Ad Space 1 */}
-        <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg border border-primary/20 p-8 text-center">
+        <div className="bg-linear-to-br from-primary/10 to-primary/5 rounded-lg border border-primary/20 p-8 text-center">
           <div className="text-xs text-muted-foreground mb-3 font-medium">IKLAN</div>
           <div className="bg-white dark:bg-slate-800 rounded h-64 flex items-center justify-center border border-dashed border-primary/30">
             <div className="text-center">
@@ -70,7 +70,7 @@ export function RightSidebar({ trendingArticles }: RightSidebarProps) {
         </div>
 
         {/* Ad Space 2 */}
-        <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg border border-primary/20 p-6 text-center">
+        <div className="bg-linear-to-br from-primary/10 to-primary/5 rounded-lg border border-primary/20 p-6 text-center">
           <div className="text-xs text-muted-foreground mb-3 font-medium">IKLAN</div>
           <div className="bg-white dark:bg-slate-800 rounded h-32 flex items-center justify-center border border-dashed border-primary/30">
             <div className="text-center">

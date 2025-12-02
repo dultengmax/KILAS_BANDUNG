@@ -131,7 +131,7 @@ export function HeroCarousel({ articles, autoScrollInterval = 5000 }: HeroCarous
 
             {/* Title */}
             <motion.h1
-              className="text-2xl md:text-4xl lg:text-6xl font-bold text-white mb-4 leading-tight line-clamp-3 drop-shadow-lg"
+              className="text-2xl md:text-3xl lg:text-5xl font-bold text-white mb-4 leading-tight line-clamp-3 drop-shadow-lg"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15, duration: 0.5 }}
@@ -189,7 +189,7 @@ export function HeroCarousel({ articles, autoScrollInterval = 5000 }: HeroCarous
 
         {/* Pagination dots with animated progress - moved to absolute bottom */}
         <div className="absolute left-0 right-0 bottom-4 flex items-center justify-center z-30 pointer-events-none">
-          <div className="flex gap-2 w-3/5 max-w-2xl pointer-events-auto">
+          <div className="flex gap-2 w-1/5 max-w-2xl pointer-events-auto">
             {articles.map((_, idx) => (
               <button
                 key={idx}
