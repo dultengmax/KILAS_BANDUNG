@@ -175,9 +175,9 @@ const categoryData: Record<string, any> = {
   },
 }
 
-export default function CategoryPage({ params }: { params: { slug: string } }) {
-  const category = categoryData[params.slug]
-
+export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+  const category = categoryData[(await params).slug]
+  const {slug} = await params
   if (!category) {
     return (
       <main className="min-h-screen bg-white dark:bg-slate-950">
@@ -229,7 +229,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
         {category.articles.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {category.articles.map((article) => (
+              {category.articles.map((article:any) => (
                 <ArticleCard key={article.id} {...article} />
               ))}
             </div>
@@ -253,7 +253,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
             {Object.entries(categoryData).map(
               ([slug, cat]) =>
-                slug !== params.slug && (
+                slug !== slug && (
                   <a
                     key={slug}
                     href={`/kategori/${slug}`}
