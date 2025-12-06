@@ -160,3 +160,7 @@
     @apply transition-colors duration-200;
   }
 }
+
+.side-effect {
+  @apply hover:scale-105 active:scale-95 transition-transform duration-150;
+}
