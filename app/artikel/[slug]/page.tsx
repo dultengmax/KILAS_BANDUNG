@@ -5,6 +5,7 @@ import { Footer } from "@/components/footer"
 import { ArticleCard } from "@/components/article-card"
 import { Share2, Clock, User, Calendar, Eye } from "lucide-react"
 import { promises } from "dns"
+import { getArticleById } from "@/lib/action/article"
 
 // Mock data - akan diganti dengan database
 const articlesDatabase: Record<string, any> = {
@@ -87,7 +88,10 @@ const relatedArticles = [
 ]
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }>  }) {
-  const article = articlesDatabase[(await params).slug]
+  const dataarticle = articlesDatabase[(await params).slug]
+  const result = await getArticleById(5  )
+  const article = result.article
+
 
   if (!article) {
     return (
@@ -117,30 +121,49 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             Beranda
           </Link>
           <span>/</span>
-          <Link href={`/kategori/${article.category.toLowerCase()}`} className="hover:text-primary">
-            {article.category}
-          </Link>
+          {Array.isArray(article.category) ? (
+            article.category.map((cat: any, idx: number) => (
+              <Link
+                key={cat + idx}
+                href={`/kategori/${typeof cat === "string" ? cat.toLowerCase() : cat}`}
+                className="hover:text-primary"
+              >
+                {cat}
+              </Link>
+            ))
+          ) : (
+            <p></p>
+          )}
           <span>/</span>
-          <span className="text-gray-900 dark:text-white font-medium line-clamp-1">{article.title}</span>
+          <span className="text-gray-900 dark:text-white font-medium truncate max-w-xs md:max-w-lg text-wrap line-clamp-2" title={article.title}>
+            {article.title}
+          </span>
         </div>
 
         {/* Category Tag */}
         <div className="mb-4">
-          <span className="inline-block bg-primary text-white text-xs font-bold px-4 py-2 rounded-full">
-            {article.category}
-          </span>
+          {Array.isArray(article.category) && (
+            article.category.map((cat: any, idx: number) => (
+              <span
+                key={cat + idx}
+                className="inline-block bg-primary text-white text-xs font-bold px-4 py-2 rounded-full mr-2"
+              >
+                {cat}
+              </span>
+            )))
+          }
         </div>
 
         {/* Title */}
-        <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight">{article.title}</h1>
+        <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight wrap-break-word">{article.title}</h1>
 
         {/* Article Meta */}
-        <div className="flex flex-wrap gap-4 md:gap-6 pb-6 border-b border-gray-200 dark:border-slate-700 mb-8">
+        <div className="flex flex-wrap gap-4 md:gap-6 pb-6 border-b border-gray-200 dark:bord
+        er-slate-700 mb-8">
           <div className="flex items-center gap-2 text-sm">
             <User className="w-4 h-4 text-primary" />
             <div>
               <p className="font-semibold text-gray-900 dark:text-white">{article.author}</p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">{article.authorBio}</p>
             </div>
           </div>
 
@@ -162,14 +185,16 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <Eye className="w-4 h-4" />
-            <span>{article.views.toLocaleString("id-ID")} views</span>
+            <span>
+              {typeof article?.views === 'number' ? article.views.toLocaleString("id-ID") : '0'} views
+            </span>
           </div>
         </div>
 
         {/* Featured Image */}
         <div className="relative w-full h-96 md:h-[500px] rounded-lg overflow-hidden mb-8">
           <Image
-            src={article?.featuredImage }
+            src={article?.image || ""}
             alt={article.title}
             fill
             className="object-cover"
@@ -180,7 +205,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
         {/* Article Content */}
         <div className="prose dark:prose-invert prose-lg max-w-none mb-12">
-          <div dangerouslySetInnerHTML={{ __html: article.content }} />
+          <div dangerouslySetInnerHTML={{ __html: article.content ?? "" }} />
         </div>
 
         {/* Share Section */}

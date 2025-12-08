@@ -6,13 +6,6 @@ import { Save, X, Upload, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { listUsers } from "@/lib/action/auth";
 import { getCategories } from "@/lib/action/kategory";
-import { EditorContent, useEditor } from "@tiptap/react";
-import { TextStyleKit } from "@tiptap/extension-text-style";
-import StarterKit from "@tiptap/starter-kit";
-import { MenuBar } from "@/components/articles/tip-tap";
-import Heading from '@tiptap/extension-heading'
-import Paragraph from '@tiptap/extension-paragraph'
-import TextAlign from '@tiptap/extension-text-align'
 
 // Update form fields based on prisma schema (fields: id, title, slug, excerpt, content, image, audioUrl, publishedAt, status, featured, views, like, authorId, category, tags)
 const defaultFormState = {
@@ -123,36 +116,6 @@ export default function CreateArticlePage() {
     }));
   };
 
-  const extensions = [TextStyleKit, StarterKit,     
-     TextAlign.configure({
-    types: ['heading', 'paragraph'],
-  }),]
-
-  const editor = useEditor({
-    extensions,
-    content: `
-   <p>tes...</p>
-`,
-    // Set immediatelyRender to false to avoid SSR hydration issues
-    immediatelyRender: false,
-    editorProps: {
-      attributes: {
-        class:
-          "h-96 mt-3 p-4 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary overflow-y-auto bg-white text-gray-900 font-sans text-base leading-relaxed",
-        spellCheck: "true",
-        autoCorrect: "on",
-        autoCapitalize: "sentences",
-        placeholder: "Tulis konten berita profesional Anda di sini...",
-      },
-    },
-    autofocus: true,
-    onUpdate: ({ editor }) => {
-      setFormData((prev) => ({
-        ...prev,
-        content: editor.getHTML(),
-      }));
-    },
-  })
   // Form submit
   const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -384,7 +347,7 @@ export default function CreateArticlePage() {
               </p>
             </div>
 
-            {/* <div>
+            <div>
               <label className="block text-sm font-semibold text-slate-900 dark:text-white mb-3">
                 Konten Artikel *
               </label>
@@ -397,15 +360,7 @@ export default function CreateArticlePage() {
                 className="w-full h-40 px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400"
                 required
               />
-            </div> */}
-
-            {editor && (
-              <>
-                <MenuBar editor={editor} />
-                <EditorContent editor={editor} />
-              </>
-            )}
-
+            </div>
           </section>
 
           <section className="flex space-y-5 flex-col ">

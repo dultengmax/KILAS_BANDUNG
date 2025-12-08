@@ -7,9 +7,9 @@ import DialogUser, { DeleteDialogUser, EditDialogUser } from "@/components/dashb
 import DialogCategory, { DialogEditCategory } from "./dialog-category"
 
 export default function AdminDashboard({
-    users,category
+    users,category,article
 }:{
-    users:any,category:any
+    users:any,category:any,article:any
 }) {
   const [activeTab, setActiveTab] = useState("overview")
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -18,7 +18,7 @@ export default function AdminDashboard({
   const stats = [
     {
       label: "Total Artikel",
-      value: "156",
+      value: `${article.length}`,
       icon: FileText,
       color: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400",
     },
@@ -36,117 +36,12 @@ export default function AdminDashboard({
     },
     {
       label: "Admin Users",
-      value: "5",
+      value: `${users.length}`,
       icon: Users,
       color: "bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400",
     },
   ]
 
-  const recentArticles = [
-    {
-      id: 1,
-      title: "Wali Kota Bandung Luncurkan Program Infrastruktur",
-      category: "Politik",
-      status: "published",
-      date: "28 Nov 2025",
-      views: 2345,
-      author: "Andi Kusuma",
-    },
-    {
-      id: 2,
-      title: "Persib Bandung Siapkan Strategi 2026",
-      category: "Olahraga",
-      status: "published",
-      date: "27 Nov 2025",
-      views: 1856,
-      author: "Budi Rahman",
-    },
-    {
-      id: 3,
-      title: "Rekomendasi Kuliner Bandung",
-      category: "Kuliner",
-      status: "draft",
-      date: "26 Nov 2025",
-      views: 0,
-      author: "Citra Dewi",
-    },
-    {
-      id: 4,
-      title: "Startup Bandung Raih Pendanaan $2 Juta",
-      category: "Teknologi",
-      status: "scheduled",
-      date: "25 Nov 2025",
-      views: 0,
-      author: "Eka Putri",
-    },
-    {
-      id: 5,
-      title: "Destinasi Wisata Baru di Bandung Raya",
-      category: "Gaya Hidup",
-      status: "published",
-      date: "24 Nov 2025",
-      views: 987,
-      author: "Fadli Nur",
-    },
-  ]
-
-  const categories = [
-    { 
-      id: 1, 
-      name: "Politik", 
-      count: 34, 
-      color: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300",
-      subcategories: [
-        { id: 101, name: "Pemilu" }, 
-        { id: 102, name: "Kebijakan" },
-        { id: 103, name: "Pemerintahan" },
-      ]
-    },
-    {
-      id: 2,
-      name: "Olahraga",
-      count: 28,
-      color: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300",
-      subcategories: [
-        { id: 201, name: "Sepak Bola" }, 
-        { id: 202, name: "Badminton" },
-        { id: 203, name: "Basket" },
-      ]
-    },
-    {
-      id: 3,
-      name: "Kuliner",
-      count: 42,
-      color: "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300",
-      subcategories: [
-        { id: 301, name: "Kafe" }, 
-        { id: 302, name: "Restoran" },
-        { id: 303, name: "Jajanan" },
-      ]
-    },
-    {
-      id: 4,
-      name: "Teknologi",
-      count: 19,
-      color: "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300",
-      subcategories: [
-        { id: 401, name: "Startup" }, 
-        { id: 402, name: "Inovasi" },
-        { id: 403, name: "Gadget" },
-      ]
-    },
-    { 
-      id: 5, 
-      name: "Gaya Hidup", 
-      count: 33, 
-      color: "bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300",
-      subcategories: [
-        { id: 501, name: "Traveling" }, 
-        { id: 502, name: "Fashion" },
-        { id: 503, name: "Kesehatan" },
-      ]
-    },
-  ]
 
   const adminUsers = [
     { id: 1, name: "Admin Master", email: "admin@kilasbandung.com", role: "Super Admin", status: "active" },
@@ -243,7 +138,7 @@ export default function AdminDashboard({
                 </div>
 
                 <div className="space-y-3">
-                  {recentArticles.slice(0, 4).map((article) => (
+                  {article.slice(0, 4).map((article:any) => (
                     <div
                       key={article.id}
                       className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
@@ -286,7 +181,7 @@ export default function AdminDashboard({
                 </div>
 
                 <div className="space-y-2">
-                  {categories.map((cat) => (
+                  {category.map((cat:any) => (
                     <div
                       key={cat.id}
                       className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50"
@@ -340,7 +235,7 @@ export default function AdminDashboard({
                   </tr>
                 </thead>
                 <tbody>
-                  {recentArticles.map((article) => (
+                  {article.map((article:any) => (
                     <tr
                       key={article.id}
                       className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition"
