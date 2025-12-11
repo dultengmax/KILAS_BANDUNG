@@ -14,7 +14,7 @@ interface RightSidebarProps {
 
 export function RightSidebar({ trendingArticles }: RightSidebarProps) {
   return (
-    <aside className="hidden ml-12 lg:block  lg:w-86 lg:sticky lg:top-20 lg:h-fit">
+    <aside className="hidden lg:ml-1 lg:block  lg:w-80 lg:sticky lg:top-20 lg:h-fit">
       <div className="space-y-6">
         {/* Trending Section */}
         <div className="bg-card rounded-lg border border-border shadow-md p-6">

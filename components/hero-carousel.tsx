@@ -20,7 +20,7 @@ interface CarouselArticle {
 }
 
 interface HeroCarouselProps {
-  articles: CarouselArticle[]
+  articles: any
   autoScrollInterval?: number
 }
 
@@ -66,7 +66,7 @@ export function HeroCarousel({ articles, autoScrollInterval = 5000 }: HeroCarous
     <>
       {/* Hero Section */}
       <section
-        className="relative h-96 md:h-[500px] lg:h-[550px] w-full md:w-4/5 mx-auto overflow-hidden group"
+        className="relative h-96 md:h-[500px] lg:h-[550px] w-full  mx-auto overflow-hidden group"
         onMouseEnter={() => setIsAutoScroll(false)}
         onMouseLeave={() => setIsAutoScroll(true)}
       >
@@ -106,18 +106,7 @@ export function HeroCarousel({ articles, autoScrollInterval = 5000 }: HeroCarous
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
           <div className="max-w-4xl w-full pb-16">
-            {/* Category badge */}
-            {currentArticle.breaking && (
-              <motion.div
-                className="inline-flex items-center gap-2 bg-destructive dark:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-full mb-3 shadow-xl animate-pulse"
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              >
-                <Zap className="w-4 h-4" />
-                BREAKING
-              </motion.div>
-            )}
+
 
             <motion.div
               className="inline-flex items-center gap-2 bg-primary dark:bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-full mb-4 shadow-xl hover:shadow-2xl transition-shadow smooth-transition"
@@ -157,10 +146,9 @@ export function HeroCarousel({ articles, autoScrollInterval = 5000 }: HeroCarous
               transition={{ delay: 0.3, duration: 0.5 }}
             >
               <div className="flex gap-4 text-white/90 text-sm drop-shadow-md">
-                <span className="font-medium text-xs">{currentArticle.author}</span>
+                <span className="font-medium text-xs">{currentArticle.userId}</span>
                 <span>•</span>
                 <span className="text-xs">{new Date(currentArticle.publishedAt).toLocaleDateString("id-ID")}</span>
-                <span>•</span>
               </div>
 
             </motion.div>
@@ -190,7 +178,7 @@ export function HeroCarousel({ articles, autoScrollInterval = 5000 }: HeroCarous
         {/* Pagination dots with animated progress - moved to absolute bottom */}
         <div className="absolute left-0 right-0 bottom-4 flex items-center justify-center z-30 pointer-events-none">
           <div className="flex gap-2 w-1/5 max-w-2xl pointer-events-auto">
-            {articles.map((_, idx) => (
+            {articles.map((_:any, idx:number) => (
               <button
                 key={idx}
                 onClick={() => goToSlide(idx)}

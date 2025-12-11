@@ -89,9 +89,8 @@ const relatedArticles = [
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }>  }) {
   const dataarticle = articlesDatabase[(await params).slug]
-  const result = await getArticleById(5  )
+  const result = await getArticleById(5)
   const article = result.article
-
 
   if (!article) {
     return (
@@ -112,7 +111,6 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950">
       <Header />
-
       {/* Article Header */}
       <article className="max-w-4xl mx-auto px-4 py-8 md:py-12">
         {/* Breadcrumb */}

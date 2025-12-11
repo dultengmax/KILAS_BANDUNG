@@ -8,6 +8,7 @@ import { RightSidebar } from "@/components/right-sidebar"
 import { Zap, Award } from "lucide-react"
 import { HeroCarousel } from "@/components/hero-carousel"
 import Times from "@/components/time"
+import { getArticles } from "@/lib/action/article"
 
 const articles = [
 	{
@@ -89,14 +90,55 @@ const carouselArticles = articles.slice(0, 5) // Use first 5 for carousel
 const editorsPicks = articles.slice(1, 4)
 const latestArticles = articles.slice(1)
 
-export default function HomePage() {
+export default async function HomePage() {
+	const dataArticle = await getArticles()
+	const news = dataArticle?.articles?.slice(0, 2)
 	return (
 		<main className="min-h-screen bg-background dark:bg-background smooth-transition">
 			<Times />
 			<Header />
-
 			{/* Animated Carousel Component */}
-			<HeroCarousel articles={carouselArticles} autoScrollInterval={5000} />
+			<section className="w-full md:w-4/5 mx-auto justify-center gap-2 grid grid-cols-1 md:grid-cols-4">
+				<div className="col-span-3">
+					<HeroCarousel articles={dataArticle.articles} autoScrollInterval={5000} />
+				</div>
+				<div className="md:grid grid-cols-1 hidden gap-1">
+					{news?.map((article: any, idx: number) => (
+						<Link
+							key={article.id}
+							href={`/artikel/${article.slug}`}
+							className="group flex  flex-col bg-card dark:bg-card hover:shadow-lg dark:hover:shadow-xl transition-all duration-300  overflow-hidden border border-border dark:border-border hover:border-primary/50 dark:hover:border-secondary/50 smooth-transition"
+						>
+							{/* Image Container */}
+							<div className="relative h-full md:h-full overflow-hidden bg-muted dark:bg-muted">
+								<Image
+									src={article.featuredImage || "/placeholder.svg"}
+									alt={article.title}
+									fill
+									className="object-cover group-hover:scale-110 transition-transform duration-500"
+									sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+								/>
+								{/* Gradient Overlay: darken bottom */}
+								<div className="absolute inset-0 bg-linear-to-b from-transparent via-black/30 to-black/75 pointer-events-none" />
+								{/* Index badge */}
+								<div className="absolute top-3 left-3 bg-primary dark:bg-secondary text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
+									{idx + 1}
+								</div>
+								<div className="absolute w-full space-y-2 gap-2 bottom-3 left-3 right-3">
+									<h3
+										className="text-lg truncate font-semibold text-white mb-3 line-clamp-2 "
+										title={article.title}
+									>
+										{article.title}
+									</h3>
+									<span className="text-xs mt-2 text-white absolute bottom-0 text">{new Date(article.publishedAt).toLocaleDateString("id-ID")}</span>
+								</div>
+							</div>
+
+						</Link>
+					))}
+				</div>
+			</section>
 
 			{/* Main Content */}
 			<div className="md:w-4/5  mx-auto px-5 py-12 lg:py-16 flex justify-center">
@@ -108,11 +150,10 @@ export default function HomePage() {
 							<div className="flex items-center gap-3 mb-8">
 								<div className="w-1 h-8 bg-linear-to-b from-primary to-secondary rounded-full" />
 								<h2 className="text-3xl font-bold text-foreground">Terbaru</h2>
-								<Award className="w-6 h-6 text-primary dark:text-secondary" />
 							</div>
 
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-								{editorsPicks.map((article, idx) => (
+								{news?.map((article: any, idx: number) => (
 									<Link
 										key={article.id}
 										href={`/artikel/${article.slug}`}
@@ -215,7 +256,7 @@ export default function HomePage() {
 						<section className="mb-16">
 							<h2 className="text-2xl font-bold mb-8 text-foreground flex items-center gap-3">
 								<div className="w-1 h-8 bg-linear-to-b from-primary to-secondary rounded-full" />
-								Berita Terkini
+								PRSSNI
 							</h2>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 								{latestArticles.map((article) => (

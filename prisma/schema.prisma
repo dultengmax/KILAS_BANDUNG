@@ -11,15 +11,15 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id       Int         @id @default(autoincrement())
-  email    String      @unique
+  id       Int       @id @default(autoincrement())
+  email    String    @unique
   name     String?
   password String
-  role     String?      @default("USER")
+  role     String?   @default("USER")
   Article  Article[]
 }
 
@@ -31,24 +31,24 @@ model Category {
 }
 
 model Article {
-  id             Int      @id @default(autoincrement())
-  title          String
-  slug           String   @unique
-  excerpt        String?
-  image          String?
-  audio          String?
-  category       Json?
-  subcategory    Json?
-  author         String?
-  publishedAt    DateTime
-  updatedAt      DateTime
-  readTime       Int?
-  views          Int?      @default(0)
-  featuredImage  String?
-  content        String?
-  status         String?
-  user           User     @relation(fields: [userId], references: [id])
-  userId         Int
+  id            Int      @id @default(autoincrement())
+  title         String
+  slug          String   @unique
+  excerpt       String?
+  image         String?
+  audio         String?
+  category      Json?
+  subcategory   Json?
+  author        String?
+  publishedAt   DateTime
+  updatedAt     DateTime
+  readTime      Int?
+  views         Int?     @default(0)
+  featuredImage String?
+  content       String?
+  status        String?
+  user          User     @relation(fields: [userId], references: [id])
+  userId        Int
 }
 
 model Media {
@@ -59,4 +59,18 @@ model Media {
   location    String?
   content     String?
   createdAt   DateTime @default(now())
+}
+
+model AboutUs {
+  id        Int      @id @default(autoincrement())
+  title     String
+  deskripsi String
+  image     String?
+  address   String?
+  instagram String?
+  tiktok    String?
+  facebook  String?
+  twitter   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

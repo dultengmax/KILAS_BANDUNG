@@ -69,7 +69,15 @@ export default function AdminDashboard({
               <p className="text-sm text-slate-600 dark:text-slate-400">Kilas Bandung Portal</p>
             </div>
           </div>
-          <button className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 px-4 py-2 rounded-lg transition">
+          <button
+            className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 px-4 py-2 rounded-lg transition"
+            onClick={() => {
+              // Hapus cookie auth_token
+              document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+              // Redirect ke halaman login
+              window.location.href = "/login";
+            }}
+          >
             <LogOut className="w-5 h-5" />
             <span>Logout</span>
           </button>
