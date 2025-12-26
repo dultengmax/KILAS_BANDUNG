@@ -77,7 +77,7 @@ export async function createArticle(formData: FormData) {
     const audio = formData.get("audio") as string;
     const category = JSON.parse(formData.get("category") as string ?? "[]") as string[];
     const subcategory = JSON.parse(formData.get("subcategory") as string ?? "[]") as string[];
-    const author = formData.get("author") as string;
+    const author = formData.get("authorId") as string;
     const publishedAt = formData.get("publishedAt") as string;
     const updatedAt = formData.get("updatedAt") as string;
     const readTime = Number(formData.get("readTime"));
@@ -89,6 +89,12 @@ export async function createArticle(formData: FormData) {
 
     const userIdNum = Number(userId);
 
+    const creator = await prisma.user.findFirstOrThrow({
+      where:{
+        id:Number(userId)
+      }
+    })
+
     const article = await prisma.article.create({
       data: {
         title,
@@ -98,7 +104,7 @@ export async function createArticle(formData: FormData) {
         audio,
         category,
         subcategory,
-        author,
+        author:creator?.name,
         publishedAt,
         updatedAt:publishedAt,
         readTime,
@@ -109,9 +115,6 @@ export async function createArticle(formData: FormData) {
         // Remove userId; instead, use Prisma relation 'user'
         user: {
           connect: { id: userIdNum },
-          // Optionally add connectOrCreate and create logic here if needed
-          // e.g.,
-          // connectOrCreate: { where: { id: userIdNum }, create: {/* user fields */} },
         },
       },
     });
@@ -236,8 +239,6 @@ export async function getArticleBySlug(slug: string) {
     return { success: false, error: error?.message || error };
   }
 }
-
-
 
 export async function getArticles(params = {}) {
   try {

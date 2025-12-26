@@ -21,10 +21,11 @@ interface CarouselArticle {
 
 interface HeroCarouselProps {
   articles: any
+  category:any
   autoScrollInterval?: number
 }
 
-export function HeroCarousel({ articles, autoScrollInterval = 5000 }: HeroCarouselProps) {
+export function HeroCarousel({ articles,category, autoScrollInterval = 5000 }: HeroCarouselProps) {
   const [current, setCurrent] = useState(0)
   const [isAutoScroll, setIsAutoScroll] = useState(true)
   const timerRef = useRef<NodeJS.Timeout | undefined>(undefined)
@@ -115,7 +116,7 @@ export function HeroCarousel({ articles, autoScrollInterval = 5000 }: HeroCarous
               transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 18 }}
             >
               <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-              {currentArticle.category}
+              {category.find((i:any)=>i.id === currentArticle.category)?.name}
             </motion.div>
 
             {/* Title */}

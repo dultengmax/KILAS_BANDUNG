@@ -7,6 +7,7 @@ import { Share2, Clock, User, Calendar, Eye } from "lucide-react"
 import { promises } from "dns"
 import { getArticleById, getArticleBySlug, getArticles } from "@/lib/action/article"
 import { Metadata } from "next"
+import { getCategories } from "@/lib/action/kategory"
 
 // ========= METADATA GENERATOR (Dynamic Head for SEO) =========
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -171,9 +172,23 @@ const articlesDatabase: Record<string, any> = {
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const result = await getArticleBySlug(slug);
+  const category = await getCategories()
   const article = result?.article;
 
-  const relatedArticles = (await getArticles())?.articles
+  // Fetch all articles for latest and related section
+  const allArticles = (await getArticles())?.articles || [];
+
+  // Artikel Terkait = exclude current article and pick by same/main category if available
+  const relatedArticles = Array.isArray(allArticles)
+    ? allArticles.filter((a: any) => a.slug !== slug).slice(0, 3)
+    : [];
+
+  // Berita Terkini: ambil 5 artikel terbaru (bisa diurutkan by publishedAt jika tersedia, fallback urutan asli)
+  const latestArticles = Array.isArray(allArticles)
+    ? allArticles
+        .sort((a: any, b: any) => (new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()))
+        .slice(0, 5)
+    : [];
 
   if (!article) {
     return (
@@ -188,136 +203,200 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         </div>
         <Footer />
       </main>
-    )
+    );
   }
 
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950">
       <Header />
-      {/* Article Header */}
-      <article className="max-w-4xl mx-auto px-4 py-8 md:py-12">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-6">
-          <Link href="/" className="hover:text-primary">
-            Beranda
-          </Link>
-          <span>/</span>
-          {Array.isArray(article.category) ? (
-            article.category.map((cat: any, idx: number) => (
-              <Link
-                key={cat + idx}
-                href={`/kategori/${typeof cat === "string" ? cat.toLowerCase() : cat}`}
-                className="hover:text-primary"
-              >
-                {cat}
-              </Link>
-            ))
-          ) : (
-            <p></p>
-          )}
-          <span>/</span>
-          <span className="text-gray-900 dark:text-white font-medium truncate max-w-xs md:max-w-lg text-wrap line-clamp-2" title={article.title}>
-            {article.title}
-          </span>
-        </div>
 
-        {/* Category Tag */}
-        <div className="mb-4">
-          {Array.isArray(article.category) && (
-            article.category.map((cat: any, idx: number) => (
-              <span
-                key={cat + idx}
-                className="inline-block bg-primary text-white text-xs font-bold px-4 py-2 rounded-full mr-2"
-              >
-                {cat}
+      {/* Grid: Main content (2/3) + Sidebar (1/3) */}
+      <div className="max-w-7xl px-4 mx-auto py-8 md:py-14 grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+        {/* Main Article Section */}
+        <article className="col-span-2">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-6">
+            <Link href="/" className="hover:text-primary">
+              Beranda
+            </Link>
+            <span>/</span>
+            {Array.isArray(article.category) ? (
+              article.category.map((cat: any, idx: number) => (
+                <Link
+                  key={cat + idx}
+                  href={`/kategori/${typeof cat === "string" ? cat.toLowerCase() : cat}`}
+                  className="hover:text-primary"
+                >
+                  {category.find((item: any) => item.id === Number(cat))?.name }
+                </Link>
+              ))
+            ) : (
+              <p></p>
+            )}
+            <span>/</span>
+            <span className="text-gray-900 dark:text-white font-medium truncate max-w-xs md:max-w-lg text-wrap line-clamp-2" title={article.title}>
+              {article.title}
+            </span>
+          </div>
+
+          {/* Category Tag */}
+          <div className="mb-4">
+            {Array.isArray(article.category) && (
+              article.category.map((cat: any, idx: number) => (
+                <span
+                  key={cat + idx}
+                  className="inline-block bg-primary text-white text-xs font-bold px-4 py-2 rounded-full mr-2"
+                >
+                  {category.find((item: any) => item.id === Number(cat))?.name }
+                  </span>
+              ))
+            )}
+          </div>
+
+          {/* Title */}
+          <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight wrap-break-word">{article.title}</h1>
+
+          {/* Article Meta */}
+          <div className="flex flex-wrap gap-4 md:gap-6 pb-6 border-b border-gray-200 dark:border-slate-700 mb-8">
+            <div className="flex items-center gap-2 text-sm">
+              <User className="w-4 h-4 text-primary" />
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">{article.author}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <Calendar className="w-4 h-4" />
+              <span>
+                {new Date(article.publishedAt).toLocaleDateString("id-ID", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
               </span>
-            )))
-          }
-        </div>
+            </div>
 
-        {/* Title */}
-        <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight wrap-break-word">{article.title}</h1>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <Clock className="w-4 h-4" />
+              <span>{article.readTime} min baca</span>
+            </div>
 
-        {/* Article Meta */}
-        <div className="flex flex-wrap gap-4 md:gap-6 pb-6 border-b border-gray-200 dark:bord
-        er-slate-700 mb-8">
-          <div className="flex items-center gap-2 text-sm">
-            <User className="w-4 h-4 text-primary" />
-            <div>
-              <p className="font-semibold text-gray-900 dark:text-white">{article.author}</p>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <Eye className="w-4 h-4" />
+              <span>
+                {typeof article?.views === 'number' ? article.views.toLocaleString("id-ID") : '0'} views
+              </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <Calendar className="w-4 h-4" />
-            <span>
-              {new Date(article.publishedAt).toLocaleDateString("id-ID", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </span>
+          {/* Featured Image */}
+          <div className="relative w-full h-96 md:h-[500px] rounded-lg overflow-hidden mb-8">
+            <Image
+              src={article?.image || ""}
+              alt={article.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 800px"
+              priority
+            />
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <Clock className="w-4 h-4" />
-            <span>{article.readTime} min baca</span>
+          {/* Article Content */}
+          <div className="prose dark:prose-invert prose-lg max-w-none mb-12">
+            <div dangerouslySetInnerHTML={{ __html: article.content ?? "" }} />
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <Eye className="w-4 h-4" />
-            <span>
-              {typeof article?.views === 'number' ? article.views.toLocaleString("id-ID") : '0'} views
-            </span>
+          {/* Share Section */}
+          <div className="bg-gray-100 dark:bg-slate-800 p-6 rounded-lg mb-12">
+            <div className="flex items-center gap-4">
+              <span className="font-semibold">Bagikan Artikel:</span>
+              <button className="p-2 bg-white dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition">
+                <Share2 className="w-5 h-5" />
+              </button>
+              <a href="#" className="inline-block p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                Facebook
+              </a>
+              <a href="#" className="inline-block p-2 bg-sky-400 text-white rounded-lg hover:bg-sky-500">
+                Twitter
+              </a>
+            </div>
           </div>
-        </div>
 
-        {/* Featured Image */}
-        <div className="relative w-full h-96 md:h-[500px] rounded-lg overflow-hidden mb-8">
-          <Image
-            src={article?.image || ""}
-            alt={article.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 800px"
-            priority
-          />
-        </div>
+          {/* Related Articles */}
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold mb-6 text-foreground">Artikel Terkait</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {relatedArticles?.map((relatedArticle: any, index: number) => (
+                <ArticleCard key={index} {...relatedArticle} />
+              ))}
+            </div>
+          </section>
+        </article>
 
-        {/* Article Content */}
-        <div className="prose dark:prose-invert prose-lg max-w-none mb-12">
-          <div dangerouslySetInnerHTML={{ __html: article.content ?? "" }} />
-        </div>
+        {/* Sidebar */}
+        <aside className="col-span-1">
+          {/* Berita Terkini (Latest News) */}
+          <div className="sticky top-24 space-y-10">
+            <section className="bg-white dark:bg-slate-800 rounded-xl shadow border mb-8">
+              <h2 className="text-xl font-semibold px-6 pt-6 pb-2 text-primary">Berita Terkini</h2>
+              <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+                {latestArticles.map((news: any, idx: number) => (
+                  <li key={news.slug || idx} className="px-6 py-4 hover:bg-muted/40 transition">
+                    <Link href={`/artikel/${news.slug}`} className="flex gap-3 items-center group">
+                      <div className="flex-shrink-0 w-12 h-12 rounded bg-gray-200 overflow-hidden relative">
+                        {news.featuredImage && (
+                          <Image
+                            src={news.featuredImage}
+                            alt={news.title}
+                            fill
+                            className="object-cover rounded"
+                            sizes="48px"
+                          />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-sm md:text-base text-foreground group-hover:text-primary line-clamp-2">{news.title}</h3>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {new Date(news.publishedAt).toLocaleDateString("id-ID", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </p>
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
 
-        {/* Share Section */}
-        <div className="bg-gray-100 dark:bg-slate-800 p-6 rounded-lg mb-12">
-          <div className="flex items-center gap-4">
-            <span className="font-semibold">Bagikan Artikel:</span>
-            <button className="p-2 bg-white dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition">
-              <Share2 className="w-5 h-5" />
-            </button>
-            <a href="#" className="inline-block p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-              Facebook
-            </a>
-            <a href="#" className="inline-block p-2 bg-sky-400 text-white rounded-lg hover:bg-sky-500">
-              Twitter
-            </a>
+            {/* Iklan Sidebar */}
+            <section className="bg-white dark:bg-slate-800 rounded-xl shadow border flex flex-col items-center p-6">
+              <div className="mb-3 flex gap-2 items-center">
+                <span className="text-xs uppercase font-bold text-primary tracking-wide">Iklan</span>
+                <span className="inline-block animate-pulse bg-primary/60 rounded-full w-2 h-2"></span>
+              </div>
+              {/* Placeholder or Ad image */}
+              <div className="w-full h-40 md:h-56 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                <span className="text-gray-400 text-center font-medium">
+                  Tempat untuk <br />
+                  <span className="font-bold text-primary">IKLAN ANDA</span>
+                  <br />
+                  (336x280)
+                </span>
+              </div>
+              {/* Optional: tambahkan CTA/teks info iklan */}
+              <p className="text-xs md:text-sm text-muted-foreground mt-4 text-center">
+                Hubungi <a href="mailto:iklan@kilasbandung.id" className="underline text-primary">iklan@kilasbandung.id</a> untuk pasang iklan di sini.
+              </p>
+            </section>
           </div>
-        </div>
-
-        {/* Related Articles */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 text-foreground">Artikel Terkait</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {relatedArticles?.map((relatedArticle:any,index:number) => (
-              <ArticleCard key={index} {...relatedArticle} />
-            ))}
-          </div>
-        </section>
-      </article>
+        </aside>
+      </div>
 
       {/* Footer */}
       <Footer />
     </main>
-  )
+  );
 }

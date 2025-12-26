@@ -251,7 +251,7 @@ export default function CreateArticlePage() {
         like: Number(formData.like) || 0,
         authorId: formData.authorId,
         userId: formData.authorId,
-        category: formData.subcategory ? JSON.stringify(formData.subcategory) : "",
+        category: formData.subcategory ? JSON.stringify(formData.category) : "",
         subcategory: formData.subcategory ? JSON.stringify(formData.subcategory) : "",
         tags: formData.tags || "",
       };
@@ -428,6 +428,7 @@ export default function CreateArticlePage() {
               <div className="max-h-48 overflow-y-auto rounded-md border border-input bg-muted/50 p-2 flex flex-col gap-2">
                 {category && Array.isArray(category) && category.map((cat: { id: string | number; name: string; subCategory?: string[] }) => (
                   <section key={cat.id}>
+
                     <label className="flex flex-col sm:flex-row items-center gap-2 px-3 py-2 rounded-md hover:bg-primary/10 transition cursor-pointer">
                       <input
                         type="checkbox"
@@ -533,7 +534,7 @@ export default function CreateArticlePage() {
                 >
                   <option value="">Pilih Penulis</option>
                   {user && Array.isArray(user) && user.map((u: { id: string | number; name?: string; email: string }) => (
-                    <option key={u.id} value={u.id}>
+                    <option key={u.name} value={u.id}>
                       {u.name ? `${u.name} (${u.email})` : u.email}
                     </option>
                   ))}

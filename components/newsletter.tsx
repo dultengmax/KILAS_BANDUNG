@@ -1,57 +1,30 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
-import { Mail } from "lucide-react"
+import { Megaphone } from "lucide-react"
 
 export function Newsletter() {
-  const [email, setEmail] = useState("")
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setStatus("loading")
-
-    // Simulate API call
-    setTimeout(() => {
-      setStatus("success")
-      setEmail("")
-      setTimeout(() => setStatus("idle"), 3000)
-    }, 1000)
-  }
-
+  // Tidak perlu state untuk banner iklan
   return (
-    <section className="bg-gradient-to-br from-primary to-secondary rounded-xl p-8 md:p-12 text-white mb-16">
-      <div className="max-w-2xl mx-auto text-center">
-        <div className="flex justify-center mb-4">
-          <Mail className="w-12 h-12 opacity-80" />
+    <section className="bg-linear-to-br from-amber-500 to-orange-600 rounded-xl p-8 md:p-12 text-white mb-16 flex items-center justify-center shadow-xl">
+      <div className="max-w-3xl mx-auto w-full flex flex-col md:flex-row items-center gap-8">
+        <div className="shrink-0 mb-6 md:mb-0">
+          <div className="flex items-center justify-center h-20 w-20 rounded-full bg-white/30 border border-white/40 shadow">
+            <Megaphone className="w-12 h-12 text-white" />
+          </div>
         </div>
-        <h2 className="text-3xl font-bold mb-2">Berlangganan Newsletter</h2>
-        <p className="text-blue-100 mb-8">Dapatkan berita terbaru dari Bandung langsung di inbox Anda setiap hari.</p>
-
-        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
-          <input
-            type="email"
-            placeholder="Email Anda"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="flex-1 px-4 py-3 rounded-lg text-slate-900 font-medium placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-white"
-          />
-          <button
-            type="submit"
-            disabled={status === "loading"}
-            className="bg-white hover:bg-blue-50 text-primary font-bold px-8 py-3 rounded-lg transition-colors disabled:opacity-50"
+        <div className="flex-1 text-center md:text-left">
+          <h2 className="text-3xl font-extrabold mb-2 tracking-tight">Iklankan Bisnis Anda di Bandung News</h2>
+          <p className="mb-4 text-white/90 leading-relaxed">
+            Maksimalkan visibilitas <span className="font-semibold">brand</span> dan <span className="font-semibold">produk</span> Anda melalui platform <b>Bandung News</b> yang sudah dipercaya ribuan pembaca setiap hari.
+            Tawarkan solusi, promosikan layanan, dan perluas jangkauan bisnis Anda bersama kami.
+          </p>
+          <a
+            href="mailto:iklan@bandungnews.com"
+            className="inline-block bg-white text-amber-700 font-bold px-8 py-3 rounded-lg shadow hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-white/70 mt-2 transition-all"
           >
-            {status === "loading" ? "Mengirim..." : "Daftar"}
-          </button>
-        </form>
-
-        {status === "success" && (
-          <p className="text-blue-100 mt-4 text-sm">Terima kasih! Silakan cek email Anda untuk konfirmasi.</p>
-        )}
+            Hubungi Tim Kami
+          </a>
+        </div>
       </div>
     </section>
-  )
-}
+  )}

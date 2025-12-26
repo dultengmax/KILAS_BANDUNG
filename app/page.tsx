@@ -9,6 +9,7 @@ import { Zap, Award } from "lucide-react"
 import { HeroCarousel } from "@/components/hero-carousel"
 import Times from "@/components/time"
 import { getArticles } from "@/lib/action/article"
+import { getCategories } from "@/lib/action/kategory"
 
 const articles = [
 	{
@@ -92,7 +93,11 @@ const latestArticles = articles.slice(1)
 
 export default async function HomePage() {
 	const dataArticle = await getArticles()
-	const news = dataArticle?.articles?.slice(0, 2)
+	const categoryName = await getCategories()
+
+	console.log(categoryName[0]);
+	
+	const news = dataArticle?.articles?.slice(0, 6)
 	return (
 		<main className="min-h-screen bg-background dark:bg-background smooth-transition">
 			<Times />
@@ -100,7 +105,7 @@ export default async function HomePage() {
 			{/* Animated Carousel Component */}
 			<section className="w-full md:w-3/4 mx-auto justify-center gap-2 grid grid-cols-1 md:grid-cols-4 md:mt-3">
 				<div className="col-span-3">
-					<HeroCarousel articles={dataArticle.articles} autoScrollInterval={5000} />
+					<HeroCarousel category={categoryName} articles={dataArticle.articles} autoScrollInterval={5000} />
 				</div>
 				<div className="md:grid grid-cols-1 hidden gap-1">
 					{news?.map((article: any, idx: number) => (
@@ -169,15 +174,13 @@ export default async function HomePage() {
 												sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
 											/>
 											{/* Index badge */}
-											<div className="absolute top-3 left-3 bg-primary dark:bg-secondary text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
-												{idx + 1}
-											</div>
+
 										</div>
 
 										{/* Content */}
 										<div className="flex-1 p-4 flex flex-col">
 											<span className="text-xs font-bold text-primary dark:text-secondary mb-2 uppercase">
-												{article.category}
+												{categoryName.find((item:any)=>item.id === Number(article.category[0]))?.name}
 											</span>
 											<h3 className="text-lg font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary dark:group-hover:text-secondary transition-colors">
 												{article.title}
