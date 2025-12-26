@@ -98,7 +98,7 @@ export default async function HomePage() {
 			<Times />
 			<Header />
 			{/* Animated Carousel Component */}
-			<section className="w-full md:w-4/5 mx-auto justify-center gap-2 grid grid-cols-1 md:grid-cols-4">
+			<section className="w-full md:w-3/4 mx-auto justify-center gap-2 grid grid-cols-1 md:grid-cols-4 md:mt-3">
 				<div className="col-span-3">
 					<HeroCarousel articles={dataArticle.articles} autoScrollInterval={5000} />
 				</div>
@@ -152,7 +152,7 @@ export default async function HomePage() {
 								<h2 className="text-3xl font-bold text-foreground">Terbaru</h2>
 							</div>
 
-							<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+							<div className="grid grid-cols-2 md:grid-cols-3 gap-6">
 								{news?.map((article: any, idx: number) => (
 									<Link
 										key={article.id}

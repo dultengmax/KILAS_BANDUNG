@@ -5,7 +5,124 @@ import { Footer } from "@/components/footer"
 import { ArticleCard } from "@/components/article-card"
 import { Share2, Clock, User, Calendar, Eye } from "lucide-react"
 import { promises } from "dns"
-import { getArticleById } from "@/lib/action/article"
+import { getArticleById, getArticleBySlug, getArticles } from "@/lib/action/article"
+import { Metadata } from "next"
+
+// ========= METADATA GENERATOR (Dynamic Head for SEO) =========
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const {slug} = await params
+  const result = await getArticleBySlug(slug)
+  const article = result?.article
+
+  if (!article) {
+    return {
+      title: "Postingan Tidak Ditemukan | Portal Berita Indonesia",
+      description: "Maaf, artikel yang Anda cari tidak ditemukan.",
+      robots: {
+        index: false,
+        follow: false,
+        nocache: true,
+      },
+    }
+  }
+
+  // Ganti dengan nama situs yang lebih unik & memorable
+  const siteName = "Kilas Bandung • Berita Terkini & Inspiratif"
+  const url = `https://kilasbandung.id/artikel/${article.slug}`
+  const publishedTime = article.publishedAt ? new Date(article.publishedAt).toISOString() : ""
+  const updatedTime = article.updatedAt ? new Date(article.updatedAt).toISOString() : publishedTime
+  const mainImage =
+    article.image ||
+    article.featuredImage ||
+    "/opengraph-default-news.jpg"
+
+  // Compose keywords for SEO: combine title, categories, author, city names, etc.
+  const keywordsFromCategory = Array.isArray(article.category)
+    ? article.category
+    : (typeof article.category === "string" ? [article.category] : [])
+  const extraTags = [
+    ...keywordsFromCategory,
+    article?.author || "",
+    ...(article?.title || "").split(" "),
+    ...(article?.excerpt || "").split(" "),
+    "Portal Berita Indonesia", "Berita", "Terkini", "Update", "Indonesia"
+  ]
+  const metaKeywords = Array.from(new Set(extraTags.map(t => (t || "").toString().toLowerCase()))).join(", ")
+
+  return {
+    title: `${article.title} | ${siteName}`,
+    description: article?.excerpt || (typeof article.content === "string"
+      ? article.content.replace(/<[^>]+>/g, "").substring(0, 170)
+      : siteName),
+    keywords: metaKeywords,
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      type: "article",
+      locale: "id_ID",
+      title: article.title,
+      description: article?.excerpt || "",
+      url: url,
+      siteName: siteName,
+      publishedTime: publishedTime || undefined,
+      modifiedTime: updatedTime || undefined,
+      authors: article.author ? [article.author] : undefined,
+      images: [
+        {
+          url: mainImage,
+          width: 1200,
+          height: 630,
+          alt: article.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      site: "@yourtwitterhandle", // Ganti dengan akun Twitter portal Anda
+      title: article.title,
+      description: article?.excerpt || "",
+      images: [mainImage],
+      creator: article?.author ? `@${article.author.replace(/\s+/g, "")}` : undefined,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+    authors: article?.author
+      ? [{ name: article.author, url: `https://kilasbandung.id/penulis/${encodeURIComponent(article.author)}` }]
+      : undefined,
+    other: {
+      "article:tag": metaKeywords,
+      "article:published_time": publishedTime || "",
+      "article:modified_time": updatedTime || "",
+      // Schema.org JSON-LD markup for Article
+      "application/ld+json": JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "NewsArticle",
+        "headline": article.title,
+        "image": [mainImage],
+        "datePublished": publishedTime,
+        "dateModified": updatedTime,
+        "author": {
+          "@type": "Person",
+          "name": article.author || "",
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": siteName,
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://yourdomain.com/logo-berita.png",
+          }
+        },
+        "description": article?.excerpt || "",
+        "mainEntityOfPage": url,
+      }),
+    },
+  }
+}
+// ========== END METADATA GENERATOR ===============
 
 // Mock data - akan diganti dengan database
 const articlesDatabase: Record<string, any> = {
@@ -51,46 +168,12 @@ const articlesDatabase: Record<string, any> = {
   },
 }
 
-const relatedArticles = [
-  {
-    id: "2",
-    title: "DPRD Bandung Setujui Anggaran Pendidikan Tertinggi dalam Sejarah",
-    slug: "dprd-bandung-anggaran-pendidikan",
-    excerpt: "Rencana anggaran 2026 mengalokasikan 30% dari total budget untuk pendidikan.",
-    featuredImage: "/public/bandung-school-education-building-classroom.jpg",
-    category: "Politik",
-    author: "Dewi Kurniawan",
-    publishedAt: "2025-11-23",
-    readTime: 4,
-  },
-  {
-    id: "3",
-    title: "Pertumbuhan Ekonomi Bandung Mencapai 5.2% di Kuartal III",
-    slug: "pertumbuhan-ekonomi-bandung-q3",
-    excerpt: "Analisis menunjukkan pertumbuhan ekonomi berkelanjutan di sektor manufaktur dan pariwisata.",
-    featuredImage: "/placeholder.svg?key=d3fgv",
-    category: "Politik",
-    author: "Rian Wijaya",
-    publishedAt: "2025-11-22",
-    readTime: 5,
-  },
-  {
-    id: "4",
-    title: "Kolaborasi Pemerintah dan Swasta untuk Pembangunan Smart City Bandung",
-    slug: "smart-city-bandung-kolaborasi",
-    excerpt: "Inisiatif transformasi digital akan melibatkan 15 perusahaan teknologi terkemuka.",
-    featuredImage: "/placeholder.svg?key=k8nqs",
-    category: "Teknologi",
-    author: "Budi Santoso",
-    publishedAt: "2025-11-21",
-    readTime: 6,
-  },
-]
+export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const result = await getArticleBySlug(slug);
+  const article = result?.article;
 
-export default async function ArticlePage({ params }: { params: Promise<{ slug: string }>  }) {
-  const dataarticle = articlesDatabase[(await params).slug]
-  const result = await getArticleById(5)
-  const article = result.article
+  const relatedArticles = (await getArticles())?.articles
 
   if (!article) {
     return (
@@ -226,8 +309,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-6 text-foreground">Artikel Terkait</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {relatedArticles.map((relatedArticle) => (
-              <ArticleCard key={relatedArticle.id} {...relatedArticle} />
+            {relatedArticles?.map((relatedArticle:any,index:number) => (
+              <ArticleCard key={index} {...relatedArticle} />
             ))}
           </div>
         </section>

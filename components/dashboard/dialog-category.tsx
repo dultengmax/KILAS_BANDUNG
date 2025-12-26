@@ -11,7 +11,7 @@ import { Edit2, Trash2 } from "lucide-react";
 
 // Import server action
 
-import { createCategory, updateCategory } from "@/lib/action/kategory";
+import { createCategory, deleteCategory, updateCategory } from "@/lib/action/kategory";
 
 const DialogCategory = () => {
     const [open, setOpen] = useState(false);
@@ -275,7 +275,7 @@ export const DialogEditCategory = ({
 
 
 
-export function DialogDeleteCategory({ categoryId, onDeleted }: { categoryId: string, onDeleted?: () => void }) {
+export function DialogDeleteCategory({ categoryId, onDeleted }: { categoryId: number, onDeleted?: () => void }) {
     const [open, setOpen] = useState(false);
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
@@ -284,9 +284,7 @@ export function DialogDeleteCategory({ categoryId, onDeleted }: { categoryId: st
         setError(null);
         startTransition(async () => {
             try {
-                // deleteCategory is assumed available from "@/lib/action/kategory"
-                // If not, please import accordingly.
-                // @ts-ignore
+
                 await deleteCategory(categoryId);
                 setOpen(false);
                 toast.success("Kategori berhasil dihapus!");

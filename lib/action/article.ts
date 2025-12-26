@@ -1,4 +1,6 @@
+"use server"
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 // Zod schema for Article input validation (with string/array normalization for FormData)
@@ -179,22 +181,63 @@ export async function deleteArticle(id: number) {
     await prisma.article.delete({
       where: { id },
     });
-    return { success: true };
+
+    // Tambahkan revalidate path untuk memastikan cache terupdate (Next.js App Router style)
+revalidatePath('/admin')
+revalidatePath('/')
+revalidatePath('/kategori')
+
+    return { success: true, message: "Artikel berhasil dihapus." };
   } catch (error: any) {
-    return { success: false, error: error.message || error };
+    return { success: false, message: error.message || error, error: error.message || error };
   }
 }
 
 export async function getArticleById(id: number) {
   try {
+    // Pastikan id adalah number
+    const numericId = Number(id);
+    if (isNaN(numericId)) {
+      return { success: false, error: "ID artikel tidak valid." };
+    }
+
     const article = await prisma.article.findUnique({
-      where: { id },
+      where: { id: numericId },
     });
+
+    if (!article) {
+      return { success: false, error: "Artikel tidak ditemukan." };
+    }
     return { success: true, article };
   } catch (error: any) {
-    return { success: false, error: error.message || error };
+    return { success: false, error: error?.message || error };
   }
 }
+
+export async function getArticleBySlug(slug: string) {
+  try {
+    // Validasi slug: harus string, minimal 3 karakter, hanya huruf, angka dan dash
+    if (
+      !slug ||
+      typeof slug !== "string" ||
+      !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) ||
+      slug.length < 3
+    ) {
+      return { success: false, error: "Slug tidak valid. Slug minimal 3 karakter, huruf kecil/angka/dash." };
+    }
+    const article = await prisma.article.findFirstOrThrow({
+      where: { slug },
+    });
+    if (!article) {
+      return { success: false, error: "Artikel tidak ditemukan." };
+    }
+    return { success: true, article };
+  } catch (error: any) {
+    return { success: false, error: error?.message || error };
+  }
+}
+
+
 
 export async function getArticles(params = {}) {
   try {

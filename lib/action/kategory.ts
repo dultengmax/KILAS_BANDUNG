@@ -81,5 +81,7 @@ export async function deleteCategory(id: number) {
     where: { id },
   });
   revalidatePath("/category");
+  revalidatePath("/admin");
+  revalidatePath("/");
   return category;
 }

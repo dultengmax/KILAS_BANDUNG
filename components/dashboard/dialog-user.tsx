@@ -7,6 +7,7 @@ import React, { useEffect, useState, useTransition } from "react";
 import { createUser, deleteUser, getUser, updateUser } from "@/lib/action/auth";
 import { toast } from "sonner";
 import { Edit2, Trash2 } from "lucide-react";
+import { deleteArticle } from "@/lib/action/article";
 
 
 // Import server action
@@ -209,4 +210,82 @@ export const DeleteDialogUser = ({ id }: { id: number }) => {
     </Dialog>
   )
 
+}
+
+
+export const DeleteDialogArticle = ({ id }: { id: number }) => {
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  const handleDelete = async (formData: FormData) => {
+    setError(null);
+    setSuccess(false);
+    startTransition(async () => {
+      const res = await deleteArticle(id);
+      if (res.success) {
+        setSuccess(true);
+        setOpen(false);
+        toast.success("Artikel berhasil dihapus!");
+      } else {
+        setError(res.message || "Gagal menghapus artikel.");
+        toast.error(res.message || "Gagal menghapus artikel.");
+      }
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded"
+        aria-label="Hapus Artikel"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            Konfirmasi Hapus Artikel
+          </DialogTitle>
+        </DialogHeader>
+        <div className="mb-3">
+          <p className="text-slate-600 dark:text-slate-400">
+            Apakah Anda yakin ingin menghapus artikel ini? Tindakan ini tidak dapat dibatalkan.
+          </p>
+          {error && (
+            <div className="mt-2 text-red-600 dark:text-red-400 text-sm font-medium">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="mt-2 text-green-600 dark:text-green-400 text-sm font-medium">
+              Artikel berhasil dihapus.
+            </div>
+          )}
+        </div>
+        <form action={handleDelete}>
+          <DialogFooter className="flex justify-end gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={isPending}
+            >
+              Batal
+            </Button>
+            <Button
+              type="submit"
+              disabled={isPending}
+              variant="destructive"
+            >
+              {isPending ? "Menghapus..." : "Hapus"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
 }

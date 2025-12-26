@@ -54,7 +54,9 @@ model Article {
 model Media {
   id          Int      @id @default(autoincrement())
   url         String
-  type        String
+  image       String?
+  video       String?
+  type        String?
   description String?
   location    String?
   content     String?
@@ -65,6 +67,9 @@ model AboutUs {
   id        Int      @id @default(autoincrement())
   title     String
   deskripsi String
+  email     String?
+  visi      String?
+  misi      String?
   image     String?
   address   String?
   instagram String?

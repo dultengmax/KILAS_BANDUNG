@@ -3,8 +3,11 @@
 import { useState } from "react"
 import Link from "next/link"
 import { FileText, Users, Eye, LogOut, Plus, Edit2, Trash2 } from "lucide-react"
-import DialogUser, { DeleteDialogUser, EditDialogUser } from "@/components/dashboard/dialog-user"
-import DialogCategory, { DialogEditCategory } from "./dialog-category"
+import DialogUser, { DeleteDialogArticle, DeleteDialogUser, EditDialogUser } from "@/components/dashboard/dialog-user"
+import DialogCategory, { DialogDeleteCategory, DialogEditCategory } from "./dialog-category"
+import { Button } from "../ui/button"
+import MediaList from "./media"
+import ProfileContent from "./profilecontent"
 
 export default function AdminDashboard({
     users,category,article
@@ -51,9 +54,8 @@ export default function AdminDashboard({
     { id: 5, name: "Moderator", email: "moderator@kilasbandung.com", role: "Moderator", status: "inactive" },
   ]
 
-  function setOpen(open: boolean): void {
-    throw new Error("Function not implemented.")
-  }
+
+  
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
@@ -91,7 +93,9 @@ export default function AdminDashboard({
             { id: "overview", label: "Overview" },
             { id: "articles", label: "Kelola Artikel" },
             { id: "categories", label: "Kelola Kategori" },
+            { id: "media", label: "Kelola Assets" },
             { id: "users", label: "Kelola Admin" },
+            { id: "profile", label: "profile" },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -275,18 +279,10 @@ export default function AdminDashboard({
                       <td className="py-4 px-4 text-slate-600 dark:text-slate-400 text-sm">{article.date}</td>
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-2">
-                          <button className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded">
+                          <Link href={`/admin/artikel/edit/${article.id}`}  className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded">
                             <Edit2 className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setSelectedArticle(article.id)
-                              setShowDeleteModal(true)
-                            }}
-                            className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          </Link >
+<DeleteDialogArticle id={article.id} />
                         </div>
                       </td>
                     </tr>
@@ -325,14 +321,7 @@ export default function AdminDashboard({
                             {cat.subCategory.map((sub: any,index:number) => (
                               <li key={index} className="flex items-center justify-between">
                                 <span>{sub}</span>
-                                <span className="flex items-center gap-1">
-                                  <button className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded">
-                                    <Edit2 className="w-3 h-3" />
-                                  </button>
-                                  <button className="p-1 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded">
-                                    <Trash2 className="w-3 h-3" />
-                                  </button>
-                                </span>
+
                               </li>
                             ))}
                           </ul>
@@ -342,9 +331,7 @@ export default function AdminDashboard({
                     <div className="flex items-center gap-2">
 
                       <DialogEditCategory category={cat} />
-                      <button className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+<DialogDeleteCategory categoryId={cat.id}  />
                     </div>
                   </div>
                 </div>
@@ -353,6 +340,10 @@ export default function AdminDashboard({
           </div>
         )}
 
+        {/* Admin Users Management Tab */}
+        {activeTab === "media" && (
+<MediaList/>
+        )}
         {/* Admin Users Management Tab */}
         {activeTab === "users" && (
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6">
@@ -412,10 +403,13 @@ export default function AdminDashboard({
             </div>
           </div>
         )}
+        {activeTab === "profile" && (
+<ProfileContent/>
+        )}
       </div>
 
       {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
+      {/* {showDeleteModal && (
         <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-slate-800 rounded-lg p-6 max-w-sm w-full shadow-lg">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Konfirmasi Hapus</h3>
@@ -431,7 +425,7 @@ export default function AdminDashboard({
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   )
 }

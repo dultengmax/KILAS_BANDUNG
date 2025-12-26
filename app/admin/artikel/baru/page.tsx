@@ -66,6 +66,7 @@ export default function CreateArticlePage() {
 
   const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+  const UPLOAD_AUDIO = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_AUDIO;
 
   // Handle field changes
   const handleChange = (
@@ -114,7 +115,33 @@ export default function CreateArticlePage() {
       setFormData((prev) => ({ ...prev, image: "" }));
     }
   };
-  const handleRemoveImage = () => {
+  const handleRemoveImage = async () => {
+    // Hapus dari Cloudinary jika URL valid
+    let imageUrlToDelete = imageUrl || formData.image;
+    // Optional: toast/loading state...
+    if (imageUrlToDelete) {
+      // Ekstrak public_id dari URL
+      const regex = /\/v\d+\/([^/]+)\.\w{3,4}$/;
+      const match = imageUrlToDelete.match(regex);
+      try {
+        setLoading(true);
+        await fetch('/api/upload/delete', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            public_id: match ? match[1] : null,
+            resource_type: 'image',
+          }),
+        });
+        toast.success("Gambar berhasil dihapus dari server.");
+      } catch (err) {
+        toast.error("Gagal menghapus gambar dari server.");
+      } finally {
+        setLoading(false);
+      }
+    }
     setFile(null);
     setImageUrl("");
     setFormData((prev) => ({
@@ -295,6 +322,8 @@ export default function CreateArticlePage() {
     }
   };
 
+
+  
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       {/* Header */}
@@ -313,26 +342,7 @@ export default function CreateArticlePage() {
         </div>
       </header>
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Preview Button */}
-        <div className="mb-6 flex justify-end">
-          <button
-            type="button"
-            onClick={() => setShowPreview((p) => !p)}
-            className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition"
-          >
-            {showPreview ? (
-              <>
-                <EyeOff className="w-5 h-5" />
-                Sembunyikan Preview
-              </>
-            ) : (
-              <>
-                <Eye className="w-5 h-5" />
-                Lihat Preview
-              </>
-            )}
-          </button>
-        </div>
+
         <form
           onSubmit={handleUpload}
           className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border grid grid-cols-4 gap-4 border-slate-200 dark:border-slate-700 p-6 space-y-6"
@@ -340,7 +350,7 @@ export default function CreateArticlePage() {
           {/* Title */}
 
           <section className="space-y-2 col-span-3">
-            <div>
+            <div className="mb-6">
               <label
                 htmlFor="article-title"
                 className="block text-sm font-semibold text-slate-900 dark:text-white mb-2"
@@ -364,7 +374,7 @@ export default function CreateArticlePage() {
             <div>
               <label
                 htmlFor="article-slug"
-                className="block text-sm font-semibold text-slate-900 dark:text-white mb-2"
+                className="hidden text-sm font-semibold text-slate-900 dark:text-white mb-2"
               >
                 Slug (URL Friendly) *
               </label>
@@ -375,11 +385,11 @@ export default function CreateArticlePage() {
                 value={formData.slug}
                 onChange={handleChange}
                 placeholder="judul-artikel-dalam-slug"
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400"
+                className="w-full hidden px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400"
                 autoComplete="off"
                 required
               />
-              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+              <p className="text-xs hidden text-slate-600 dark:text-slate-400 mt-1">
                 Slug otomatis dari judul. Huruf kecil & tanda strip.
               </p>
             </div>
@@ -604,31 +614,160 @@ export default function CreateArticlePage() {
             {/* Audio URL */}
             <div>
               <label
-                htmlFor="audioUrl"
+                htmlFor="audio-upload"
                 className="block text-sm font-semibold text-slate-900 dark:text-white mb-2"
               >
-                Audio (Link MP3 / opsional)
+                Audio (File MP3 / opsional)
               </label>
-              <input
-                id="audioUrl"
-                name="audioUrl"
-                type="text"
-                value={formData.audioUrl}
-                onChange={handleChange}
-                placeholder="https://audio-url.mp3"
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400"
-              />
-              {formData.audioUrl && (
+              {formData.audioUrl ? (
                 <div className="mt-2">
                   <audio src={formData.audioUrl} controls />
                   <button
-                    onClick={() => setFormData((f) => ({ ...f, audioUrl: "" }))}
+                    onClick={async () => {
+                      const audioUrl = formData.audioUrl;
+                      if (!audioUrl) {
+                        setFormData((f) => ({ ...f, audioUrl: "" }));
+                        return;
+                      }
+
+
+                      const regex = /\/v\d+\/([^/]+)\.\w{3,4}$/;
+
+                      const match = audioUrl.match(regex);
+                      // Adapt to the new API of @route.ts
+                      // The API now expects { url, type } in the JSON body, type = 'audio'
+                      setLoading(true);
+                      try {
+                        const res = await fetch('/api/upload/delete', {
+                          method: 'DELETE',
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            public_id: match ? match[1] : null,
+                            resource_type: 'video',
+                          }),
+                        });
+
+                        let apiJson = null;
+                        try {
+                          apiJson = await res.json();
+                        } catch {}
+
+                        if (res.ok && apiJson?.success) {
+                          toast.success("Audio berhasil dihapus.");
+                        } else {
+                          // Ambil pesan error prioritas dari apiJson
+                          let errorMsg = "Gagal menghapus audio.";
+                          if (apiJson?.message) {
+                            errorMsg = apiJson.message;
+                          }
+                          toast.error(errorMsg);
+                        }
+                      } catch (err) {
+                        toast.error("Terjadi kesalahan saat menghapus audio.");
+                      } finally {
+                        setFormData((f) => ({ ...f, audioUrl: "" }));
+                        setLoading(false);
+                      }
+                    }}
                     type="button"
                     className="ml-3 text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition"
                   >
-                    Hapus Audio URL
+                    Hapus Audio
                   </button>
                 </div>
+              ) : (
+                <label
+                  htmlFor="audio-upload"
+                  className={`block border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-8 text-center hover:border-blue-600 dark:hover:border-blue-400 transition cursor-pointer relative`}
+                  style={{ pointerEvents: loading ? "none" : undefined, opacity: loading ? 0.7 : 1 }}
+                >
+                  {loading && (
+                    <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 flex flex-col items-center justify-center z-10 rounded-lg">
+                      <svg className="animate-spin h-10 w-10 text-blue-500 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                      </svg>
+                      <span className="text-slate-700 dark:text-slate-300 font-semibold text-sm">Uploading...</span>
+                    </div>
+                  )}
+                  <Upload className="w-12 h-12 text-slate-400 dark:text-slate-500 mx-auto mb-3" />
+                  <p className="text-slate-600 dark:text-slate-400 font-medium">
+                    Drag and drop file audio di sini
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">
+                    Atau klik untuk memilih file (MP3)
+                  </p>
+                  <input
+                    id="audio-upload"
+                    type="file"
+                    name="audio"
+                    accept="audio/mp3,audio/mpeg"
+                    className="hidden"
+                    disabled={loading}
+                    onChange={async (e) => {
+                      const file = e.target.files && e.target.files[0];
+                      if (file) {
+                        // Optional: Validate size
+                        if (file.size > 15 * 1024 * 1024) {
+                          // Limit 15MB
+                          toast.error("Ukuran file audio terlalu besar (maks 15MB).");
+                          return;
+                        }
+                        // Upload ke Cloudinary S3
+                        const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+                        const UPLOAD_AUDIO = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_AUDIO;
+
+                        if (!CLOUD_NAME || !UPLOAD_AUDIO) {
+                          toast.error("Pengaturan Cloudinary belum tersedia. Pastikan ENV sudah di-setup.");
+                          return;
+                        }
+                        setLoading(true);
+                        try {
+                          const formDataCloud = new FormData();
+                          formDataCloud.append("file", file);
+                          formDataCloud.append("upload_preset", UPLOAD_AUDIO);
+
+                          const res = await fetch(
+                            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, // audio mp3 dianggap video oleh Cloudinary
+                            {
+                              method: "POST",
+                              body: formDataCloud,
+                            }
+                          );
+                          if (!res.ok) {
+                            toast.error("Gagal upload audio ke Cloudinary.");
+                            return;
+                          }
+                          const uploadResult = await res.json();
+                          if (!uploadResult.secure_url) {
+                            toast.error("URL audio tidak ditemukan setelah upload.");
+                            return;
+                          }
+                          setFormData((f) => ({
+                            ...f,
+                            audioUrl: uploadResult.secure_url,
+                          }));
+                          toast.success("Audio berhasil diupload.");
+                        } catch (error) {
+                          toast.error("Terjadi kesalahan saat upload audio.");
+                        } finally {
+                          setLoading(false);
+                        }
+                      }
+                    }}
+                  />
+                </label>
               )}
             </div>
 
