@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     "inspirasi Bandung",
     "Sosial Bandung",
   ],
-  authors: [{ name: "Kilas Bandung", url: "https://kilasbandung.com" }],
+  authors: [{ name: "Kilas Bandung", url: "https://kilasbandung.id" }],
   creator: "Kilas Bandung Editorial Team",
   publisher: "Kilas Bandung",
   applicationName: "Kilas Bandung News Portal",
