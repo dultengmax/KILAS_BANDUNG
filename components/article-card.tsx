@@ -43,7 +43,7 @@ export function ArticleCard({data}:{data:any }){
             <div className="flex items-center justify-between mt-2 md:mt-4 pt-2 md:pt-4 border-t border-border dark:border-slate-700 text-[11px] md:text-xs text-muted-foreground">
               <span className="truncate max-w-[85px] md:max-w-none" title={data?.author}>{data?.author}</span>
               <span className="whitespace-nowrap">
-                {formatDate(data?.publishedAt)} 
+                {data?.publishedAt ? formatDate(data.publishedAt) : "-"}
               </span>
             </div>
           </div>
