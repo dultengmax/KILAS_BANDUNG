@@ -27,6 +27,7 @@ export function Header() {
   }
 
   return (
+    <>
     <header className="sticky top-0 z-50 bg-white dark:bg-card border-b border-border dark:border-border shadow-sm smooth-transition">
       <nav className="max-w-7xl mx-auto px-4 py-4">
         {/* Top Navigation */}
@@ -175,5 +176,51 @@ export function Header() {
         </AnimatePresence>
       </nav>
     </header>
+
+    </>
+  )
+}
+
+
+// Komponen "RunningNewsTicker" terpisah dari kode running text pada header.tsx (baris 179-211)
+type RunningNewsTickerProps = {
+  dataArticle: { articles: any[] }
+}
+
+export function RunningNewsTicker({ dataArticle }: {dataArticle:any}) {
+  return (
+    <div className="max-w-6xl mx-auto bg-primary/90 dark:bg-secondary/90 py-4 overflow-hidden">
+      <div className="flex items-center gap-3">
+        <span className="ml-4 text-white font-semibold text-xs md:text-sm shrink-0">
+          🟢 Berita Terkini:
+        </span>
+        <div className="relative flex-1 overflow-hidden">
+          <div
+            className="whitespace-nowrap animate-marquee text-white text-xs md:text-sm font-medium"
+            style={{
+              animation: "marquee 25s linear infinite"
+            }}
+          >
+            {dataArticle.articles
+              ?.slice(0, 10)
+              .map((berita: any, idx: number) => (
+                <span key={berita.id} className="mr-8">
+                  {berita.title}
+                </span>
+              ))}
+          </div>
+        </div>
+      </div>
+      <style jsx global>{`
+        @keyframes marquee {
+          0% {
+            transform: translateX(100%);
+          }
+          100% {
+            transform: translateX(-100%);
+          }
+        }
+      `}</style>
+    </div>
   )
 }

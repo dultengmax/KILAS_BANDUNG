@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { Header } from "@/components/header"
+import { Header, RunningNewsTicker } from "@/components/header"
 import { ArticleCard } from "@/components/article-card"
 import { Newsletter } from "@/components/newsletter"
 import { Footer } from "@/components/footer"
@@ -104,7 +104,10 @@ export default async function HomePage() {
 	return (
 		<main className="min-h-screen bg-background dark:bg-background smooth-transition">
 			<Times />
-			<Header />
+			<Header  />
+			<RunningNewsTicker dataArticle={dataArticle}/>
+			{/* Running Text for News */}
+
 			{/* Animated Carousel Component */}
 			<section className="w-full md:w-3/4 mx-auto justify-center gap-2 grid grid-cols-1 md:grid-cols-4 md:mt-3">
 				<div className="col-span-3">
