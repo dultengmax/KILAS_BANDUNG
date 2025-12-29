@@ -29,7 +29,6 @@ const articleSchemaForFormData = z.object({
     z.array(z.string()).default([])
   ),
   author: z.string().min(1),
-  authorBio: z.string().optional().nullable().default(""),
   publishedAt: z.preprocess((val) => (val ? new Date(val as string) : new Date()), z.date()),
   updatedAt: z.preprocess((val) => (val ? new Date(val as string) : new Date()), z.date()),
   readTime: z.preprocess(
@@ -137,45 +136,87 @@ export async function updateArticle(input: FormData) {
   try {
     const inputObj = formDataToObject(input);
 
-    // For category and subcategory, allow multi-value array OR comma-separated string
+    const creator = await prisma.user.findFirstOrThrow({
+      where: {
+        id: Number(inputObj.userId),
+      },
+    });
+
+    // Support JSON string category/subcategory (from frontend send - see edit_Pages.tsx)
     if (
       inputObj.category &&
-      typeof inputObj.category === "string" &&
-      inputObj.category.includes(",")
+      typeof inputObj.category === "string"
     ) {
-      inputObj.category = inputObj.category
-        .split(",")
-        .map((v: string) => v.trim())
-        .filter(Boolean);
+      try {
+        const parsed = JSON.parse(inputObj.category);
+        if (Array.isArray(parsed) || typeof parsed === "object") {
+          inputObj.category = parsed;
+        }
+      } catch {
+        // fallback to original string or comma separated array
+        if (inputObj.category.includes(",")) {
+          inputObj.category = inputObj.category
+            .split(",")
+            .map((v: string) => v.trim())
+            .filter(Boolean);
+        }
+      }
     }
     if (
       inputObj.subcategory &&
-      typeof inputObj.subcategory === "string" &&
-      inputObj.subcategory.includes(",")
+      typeof inputObj.subcategory === "string"
     ) {
-      inputObj.subcategory = inputObj.subcategory
-        .split(",")
-        .map((v: string) => v.trim())
-        .filter(Boolean);
+      try {
+        const parsed = JSON.parse(inputObj.subcategory);
+        if (Array.isArray(parsed) || typeof parsed === "object") {
+          inputObj.subcategory = parsed;
+        }
+      } catch {
+        if (inputObj.subcategory.includes(",")) {
+          inputObj.subcategory = inputObj.subcategory
+            .split(",")
+            .map((v: string) => v.trim())
+            .filter(Boolean);
+        }
+      }
     }
 
     const data = articleUpdateSchemaForFormData.parse(inputObj);
     const { id, ...updateData } = data;
 
-    // Remove userId from updateData to satisfy Prisma type requirements
+    // Remove userId from updateData because should not be updated directly
     const { userId, ...safeUpdateData } = updateData;
-    // Update each field one by one
-    let updatedArticle;
-    for (const [key, value] of Object.entries(safeUpdateData)) {
-      updatedArticle = await prisma.article.update({
-        where: { id },
-        data: { [key]: value },
-      });
+
+    // Pastikan artikel ada
+    const existing = await prisma.article.findUnique({
+      where: { id },
+    });
+    if (!existing) {
+      return { success: false, error: "Artikel tidak ditemukan" };
     }
-    const article = updatedArticle;
+
+    // Saring field undefined (jangan update ke undefined)
+    const finalUpdate: Record<string, any> = {};
+    for (const [k, v] of Object.entries(safeUpdateData)) {
+      if (typeof v !== "undefined") {
+        finalUpdate[k] = v;
+      }
+    }
+
+    // Set author to creator.name
+    finalUpdate.author = creator?.name;
+
+    // Update updatedAt jika ada di data atau otomatis oleh Prisma jika di schema
+    finalUpdate.updatedAt = new Date();
+
+    const article = await prisma.article.update({
+      where: { id },
+      data: finalUpdate,
+    });
+
     return { success: true, article };
   } catch (error: any) {
-    return { success: false, error: error.message || error };
+    return { success: false, error: error?.message || error };
   }
 }
 

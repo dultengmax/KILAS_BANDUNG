@@ -10,9 +10,9 @@ import MediaList from "./media"
 import ProfileContent from "./profilecontent"
 
 export default function AdminDashboard({
-    users,category,article
+    users,category,article,role
 }:{
-    users:any,category:any,article:any
+    users:any,category:any,article:any,role:any
 }) {
   const [activeTab, setActiveTab] = useState("overview")
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -88,6 +88,9 @@ export default function AdminDashboard({
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Navigation Tabs */}
+
+        {
+          role === "ADMIN" ? 
         <div className="mb-8 flex gap-2 border-b border-slate-200 dark:border-slate-700 overflow-x-auto">
           {[
             { id: "overview", label: "Overview" },
@@ -96,7 +99,7 @@ export default function AdminDashboard({
             { id: "media", label: "Kelola Assets" },
             { id: "users", label: "Kelola Admin" },
             { id: "profile", label: "profile" },
-          ].map((tab) => (
+          ]?.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -110,6 +113,29 @@ export default function AdminDashboard({
             </button>
           ))}
         </div>
+          
+          :
+          <div className="mb-8 flex gap-2 border-b border-slate-200 dark:border-slate-700 overflow-x-auto">
+          {[
+            { id: "overview", label: "Overview" },
+            { id: "articles", label: "Kelola Artikel" },
+            { id: "media", label: "Kelola Assets" },
+            { id: "users", label: "Kelola Admin" },
+          ]?.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`pb-4 px-2 font-medium transition-colors whitespace-nowrap ${
+                activeTab === tab.id
+                  ? "text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        }
 
         {/* Overview Tab */}
         {activeTab === "overview" && (
@@ -213,6 +239,8 @@ export default function AdminDashboard({
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-slate-900 dark:text-white">Kelola Artikel</h2>
+              {
+                role === "VIEWER"? null:
               <Link
                 href="/admin/artikel/baru"
                 className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition flex items-center gap-2"
@@ -220,6 +248,8 @@ export default function AdminDashboard({
                 <Plus className="w-5 h-5" />
                 Buat Artikel Baru
               </Link>
+
+              }
             </div>
 
             <div className="overflow-x-auto">

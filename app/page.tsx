@@ -10,6 +10,7 @@ import { HeroCarousel } from "@/components/hero-carousel"
 import Times from "@/components/time"
 import { getArticles } from "@/lib/action/article"
 import { getCategories } from "@/lib/action/kategory"
+import { Suspense } from "react"
 
 const articles = [
 	{
@@ -87,17 +88,19 @@ const articles = [
 	},
 ]
 
+
+
+
 const carouselArticles = articles.slice(0, 5) // Use first 5 for carousel
 const editorsPicks = articles.slice(1, 4)
-const latestArticles = articles.slice(1)
 
 export default async function HomePage() {
 	const dataArticle = await getArticles()
 	const categoryName = await getCategories()
+	const latestArticles = dataArticle?.articles?.slice(1)
 
-	console.log(categoryName[0]);
-	
 	const news = dataArticle?.articles?.slice(0, 6)
+	const sideHeroes = dataArticle?.articles?.slice(0, 3)
 	return (
 		<main className="min-h-screen bg-background dark:bg-background smooth-transition">
 			<Times />
@@ -107,42 +110,62 @@ export default async function HomePage() {
 				<div className="col-span-3">
 					<HeroCarousel category={categoryName} articles={dataArticle.articles} autoScrollInterval={5000} />
 				</div>
-				<div className="md:grid grid-cols-1 hidden gap-1">
-					{news?.map((article: any, idx: number) => (
-						<Link
-							key={article.id}
-							href={`/artikel/${article.slug}`}
-							className="group flex  flex-col bg-card dark:bg-card hover:shadow-lg dark:hover:shadow-xl transition-all duration-300  overflow-hidden border border-border dark:border-border hover:border-primary/50 dark:hover:border-secondary/50 smooth-transition"
-						>
-							{/* Image Container */}
-							<div className="relative h-full md:h-full overflow-hidden bg-muted dark:bg-muted">
-								<Image
-									src={article.featuredImage || "/placeholder.svg"}
-									alt={article.title}
-									fill
-									className="object-cover group-hover:scale-110 transition-transform duration-500"
-									sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-								/>
-								{/* Gradient Overlay: darken bottom */}
-								<div className="absolute inset-0 bg-linear-to-b from-transparent via-black/30 to-black/75 pointer-events-none" />
-								{/* Index badge */}
-								<div className="absolute top-3 left-3 bg-primary dark:bg-secondary text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
-									{idx + 1}
+				<Suspense
+					fallback={
+						<div className="md:grid grid-cols-1 hidden gap-1">
+							{Array.from({ length: 3 }).map((_, idx) => (
+								<div
+									key={idx}
+									className="flex flex-col h-64 bg-muted rounded-lg animate-pulse overflow-hidden border border-border"
+								>
+									<div className="relative flex-1 bg-gray-200 dark:bg-gray-700" />
+									<div className="p-4">
+										<div className="h-4 w-3/4 mb-2 bg-gray-300 dark:bg-gray-600 rounded" />
+										<div className="h-3 w-1/2 bg-gray-200 dark:bg-gray-700 rounded" />
+									</div>
 								</div>
-								<div className="absolute w-full space-y-2 gap-2 bottom-3 left-3 right-3">
-									<h3
-										className="text-lg truncate font-semibold text-white mb-3 line-clamp-2 "
-										title={article.title}
-									>
-										{article.title}
-									</h3>
-									<span className="text-xs mt-2 text-white absolute bottom-0 text">{new Date(article.publishedAt).toLocaleDateString("id-ID")}</span>
+							))}
+						</div>
+					}
+				>
+					<div className="md:grid grid-cols-1 hidden gap-1">
+						{sideHeroes?.map((article: any, idx: number) => (
+							<Link
+								key={article.id}
+								href={`/artikel/${article.slug}`}
+								className="group flex flex-col bg-card dark:bg-card hover:shadow-lg dark:hover:shadow-xl transition-all duration-300  overflow-hidden border border-border dark:border-border hover:border-primary/50 dark:hover:border-secondary/50 smooth-transition"
+							>
+								{/* Image Container */}
+								<div className="relative h-full md:h-full overflow-hidden bg-muted dark:bg-muted">
+									<Image
+										src={article.featuredImage || "/placeholder.svg"}
+										alt={article.title}
+										fill
+										className="object-cover group-hover:scale-110 transition-transform duration-500"
+										sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+									/>
+									{/* Gradient Overlay: darken bottom */}
+									<div className="absolute inset-0 bg-linear-to-b from-transparent via-black/30 to-black/75 pointer-events-none" />
+									{/* Index badge */}
+									<div className="absolute top-3 left-3 bg-primary dark:bg-secondary text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
+										{idx + 1}
+									</div>
+									<div className="absolute w-full space-y-2 gap-2 bottom-3 left-3 right-3">
+										<h3
+											className="text-lg truncate font-semibold text-white mb-3 line-clamp-2 "
+											title={article.title}
+										>
+											{article.title}
+										</h3>
+										<span className="text-xs mt-2 text-white absolute bottom-0 text">
+											{new Date(article.publishedAt).toLocaleDateString("id-ID")}
+										</span>
+									</div>
 								</div>
-							</div>
-
-						</Link>
-					))}
-				</div>
+							</Link>
+						))}
+					</div>
+				</Suspense>
 			</section>
 
 			{/* Main Content */}
@@ -152,50 +175,72 @@ export default async function HomePage() {
 					<div className="lg:col-span-2">
 						{/* Editors Pick Section */}
 						<section className="mb-16 pb-16 border-b border-border dark:border-border">
-							<div className="flex items-center gap-3 mb-8">
-								<div className="w-1 h-8 bg-linear-to-b from-primary to-secondary rounded-full" />
-								<h2 className="text-3xl font-bold text-foreground">Terbaru</h2>
+							<div className="flex flex-row sm:flex-row items-start sm:items-center gap-3 sm:gap-5 mb-8 p-3 sm:p-5 rounded-2xl bg-linear-to-r from-blue-600 via-blue-400 to-sky-400 dark:bg-linear-to-br dark:from-blue-900 dark:via-blue-700 dark:to-blue-500 shadow-lg">
+								<div className="w-2 h-8 sm:w-1 sm:h-10 rounded-full bg-linear-to-b from-amber-400 via-orange-500 to-pink-500 shadow-md" />
+								<h2 className="text-xl sm:text-2xl font-extrabold text-white drop-shadow tracking-wide">
+									Berita Terbaru
+								</h2>
 							</div>
 
-							<div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-								{news?.map((article: any, idx: number) => (
-									<Link
-										key={article.id}
-										href={`/artikel/${article.slug}`}
-										className="group flex flex-col bg-card dark:bg-card hover:shadow-lg dark:hover:shadow-xl transition-all duration-300 rounded-lg overflow-hidden border border-border dark:border-border hover:border-primary/50 dark:hover:border-secondary/50 smooth-transition"
-									>
-										{/* Image Container */}
-										<div className="relative h-40 md:h-48 overflow-hidden bg-muted dark:bg-muted">
-											<Image
-												src={article.featuredImage || "/placeholder.svg"}
-												alt={article.title}
-												fill
-												className="object-cover group-hover:scale-110 transition-transform duration-500"
-												sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-											/>
-											{/* Index badge */}
-
-										</div>
-
-										{/* Content */}
-										<div className="flex-1 p-4 flex flex-col">
-											<span className="text-xs font-bold text-primary dark:text-secondary mb-2 uppercase">
-												{categoryName.find((item:any)=>item.id === Number(article.category[0]))?.name}
-											</span>
-											<h3 className="text-lg font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary dark:group-hover:text-secondary transition-colors">
-												{article.title}
-											</h3>
-											<p className="text-sm text-muted-foreground mb-4 line-clamp-2 flex-1">
-												{article.excerpt}
-											</p>
-											<div className="flex justify-between items-center text-xs text-muted-foreground">
-												<span>{article.author}</span>
-												<span>{article.readTime} menit baca</span>
+							<Suspense fallback={
+								<div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+									{Array.from({ length: 6 }).map((_, idx) => (
+										<div
+											key={idx}
+											className="animate-pulse flex flex-col bg-card dark:bg-card rounded-lg overflow-hidden border border-border dark:border-border"
+										>
+											<div className="relative h-40 md:h-48 bg-muted dark:bg-muted" />
+											<div className="flex-1 p-4 flex flex-col">
+												<div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+												<div className="h-5 w-full bg-gray-300 dark:bg-gray-600 rounded mb-2" />
+												<div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 rounded mb-3" />
+												<div className="flex justify-between">
+													<div className="h-3 w-14 bg-gray-100 dark:bg-gray-800 rounded" />
+													<div className="h-3 w-12 bg-gray-100 dark:bg-gray-800 rounded" />
+												</div>
 											</div>
 										</div>
-									</Link>
-								))}
-							</div>
+									))}
+								</div>
+							}>
+								<div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+									{news?.map((article: any, idx: number) => (
+										<Link
+											key={article.id}
+											href={`/artikel/${article.slug}`}
+											className="group flex flex-col bg-card dark:bg-card hover:shadow-lg dark:hover:shadow-xl transition-all duration-300 rounded-lg overflow-hidden border border-border dark:border-border hover:border-primary/50 dark:hover:border-secondary/50 smooth-transition"
+										>
+											{/* Image Container */}
+											<div className="relative h-40 md:h-48 overflow-hidden bg-muted dark:bg-muted">
+												<Image
+													src={article.featuredImage || "/placeholder.svg"}
+													alt={article.title}
+													fill
+													className="object-cover group-hover:scale-110 transition-transform duration-500"
+													sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+												/>
+												{/* Index badge */}
+											</div>
+											{/* Content */}
+											<div className="flex-1 p-4 flex flex-col">
+												<span className="text-xs font-bold text-primary dark:text-secondary mb-2 uppercase">
+													{categoryName.find((item:any)=>item.id === Number(article.category[0]))?.name}
+												</span>
+												<h3 className="text-lg font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary dark:group-hover:text-secondary transition-colors">
+													{article.title}
+												</h3>
+												<p className="text-sm text-muted-foreground mb-4 line-clamp-2 flex-1">
+													{article.excerpt}
+												</p>
+												<div className="flex justify-between items-center text-xs text-muted-foreground">
+													<span>{article.author}</span>
+													<span>{article.readTime} menit baca</span>
+												</div>
+											</div>
+										</Link>
+									))}
+								</div>
+							</Suspense>
 						</section>
 
 						{/* Categories Section */}
@@ -256,22 +301,44 @@ export default async function HomePage() {
 						</section>
 
 						{/* Latest Articles Grid */}
-						<section className="mb-16">
-							<h2 className="text-2xl font-bold mb-8 text-foreground flex items-center gap-3">
-								<div className="w-1 h-8 bg-linear-to-b from-primary to-secondary rounded-full" />
-								PRSSNI
-							</h2>
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-								{latestArticles.map((article) => (
-									<ArticleCard key={article.id} {...article} />
-								))}
-							</div>
-							<div className="mt-10 text-center">
-								<button className="border-2 border-primary text-primary dark:text-secondary dark:border-secondary hover:bg-primary dark:hover:bg-secondary hover:text-white font-semibold px-8 py-3 rounded-lg transition-all hover:shadow-lg smooth-transition">
-									Muat Berita Lainnya
-								</button>
-							</div>
-						</section>
+						<Suspense
+							fallback={
+								<section className="mb-16">
+									<h2 className="text-2xl font-bold mb-8 text-foreground flex items-center gap-3">
+										<div className="w-1 h-8 bg-linear-to-b from-primary to-secondary rounded-full" />
+										PRSSNI
+									</h2>
+									<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+										{[...Array(4)].map((_, idx) => (
+											<div
+												key={idx}
+												className="animate-pulse rounded-lg h-40 bg-muted border border-border"
+											/>
+										))}
+									</div>
+									<div className="mt-10 text-center">
+										<div className="inline-block w-40 h-12 bg-muted animate-pulse rounded-lg" />
+									</div>
+								</section>
+							}
+						>
+							<section className="mb-16">
+								<h2 className="text-2xl font-bold mb-8 text-foreground flex items-center gap-3">
+									<div className="w-1 h-8 bg-linear-to-b from-primary to-secondary rounded-full" />
+									PRSSNI
+								</h2>
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+									{latestArticles?.map((article) => (
+										<ArticleCard key={article.id} data={article} />
+									))}
+								</div>
+								<div className="mt-10 text-center">
+									<button className="border-2 border-primary text-primary dark:text-secondary dark:border-secondary hover:bg-primary dark:hover:bg-secondary hover:text-white font-semibold px-8 py-3 rounded-lg transition-all hover:shadow-lg smooth-transition">
+										Muat Berita Lainnya
+									</button>
+								</div>
+							</section>
+						</Suspense>
 
 						{/* Newsletter */}
 						<Newsletter />
@@ -289,7 +356,6 @@ export default async function HomePage() {
 				</div>
 			</div>
 
-			{/* Footer */}
 			<Footer />
 		</main>
 	)

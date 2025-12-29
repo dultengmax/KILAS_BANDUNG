@@ -9,7 +9,7 @@ export function Footer() {
           {/* About */}
           <div>
             <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-              <span className="bg-gradient-to-br from-amber-600 to-orange-600 rounded p-1 w-8 h-8 flex items-center justify-center text-sm">
+              <span className="bg-linear-to-br from-amber-600 to-orange-600 rounded p-1 w-8 h-8 flex items-center justify-center text-sm">
                 K
               </span>
               Kilas Bandung
@@ -61,7 +61,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/kebijakan" className="hover:text-white transition">
+                <Link href="/privacy-policy" className="hover:text-white transition">
                   Kebijakan Privasi
                 </Link>
               </li>

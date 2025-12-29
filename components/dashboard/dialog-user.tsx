@@ -8,6 +8,7 @@ import { createUser, deleteUser, getUser, updateUser } from "@/lib/action/auth";
 import { toast } from "sonner";
 import { Edit2, Trash2 } from "lucide-react";
 import { deleteArticle } from "@/lib/action/article";
+import { deleteMedia } from "@/lib/action/media";
 
 
 // Import server action
@@ -263,6 +264,109 @@ export const DeleteDialogArticle = ({ id }: { id: number }) => {
           {success && (
             <div className="mt-2 text-green-600 dark:text-green-400 text-sm font-medium">
               Artikel berhasil dihapus.
+            </div>
+          )}
+        </div>
+        <form action={handleDelete}>
+          <DialogFooter className="flex justify-end gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={isPending}
+            >
+              Batal
+            </Button>
+            <Button
+              type="submit"
+              disabled={isPending}
+              variant="destructive"
+            >
+              {isPending ? "Menghapus..." : "Hapus"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export const DeleteDialogMedia = ({ id,imageUrl }: { id: number;imageUrl:any }) => {
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+
+
+  const handleDelete = async (formData: FormData) => {
+    setError(null);
+    setSuccess(false);
+    startTransition(async () => {
+
+      let imageUrlToDelete = imageUrl;
+      // Optional: toast/loading state...
+      if (imageUrlToDelete) {
+        // Ekstrak public_id dari URL
+        const regex = /\/v\d+\/([^/]+)\.\w{3,4}$/;
+        const match = imageUrlToDelete.match(regex);
+        try {
+          await fetch('/api/upload/delete', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              public_id: match ? match[1] : null,
+              resource_type: imageUrlToDelete.match(/\.(mp4|webm|ogg)$/i) ? 'video' : 'image',
+            }),
+          });
+          toast.success("Gambar berhasil dihapus dari server.");
+        } catch (err) {
+          toast.error("Gagal menghapus gambar dari server.");
+        } finally {
+        }
+      }
+      const res = await deleteMedia(id);
+      if (res.success) {
+        setSuccess(true);
+        setOpen(false);
+        toast.success("media berhasil dihapus!");
+      } else {
+        setError( "Gagal menghapus Media.");
+        toast.error("Gagal menghapus Media.");
+      }
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded"
+        aria-label="Hapus Media"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            Konfirmasi Hapus Media
+          </DialogTitle>
+        </DialogHeader>
+        <div className="mb-3">
+          <p className="text-slate-600 dark:text-slate-400">
+            Apakah Anda yakin ingin menghapus Media ini? Tindakan ini tidak dapat dibatalkan.
+          </p>
+          {error && (
+            <div className="mt-2 text-red-600 dark:text-red-400 text-sm font-medium">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="mt-2 text-green-600 dark:text-green-400 text-sm font-medium">
+              Media berhasil dihapus.
             </div>
           )}
         </div>

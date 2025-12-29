@@ -16,6 +16,7 @@ import TextAlign from '@tiptap/extension-text-align'
 
 // Update form fields based on prisma schema (fields: id, title, slug, excerpt, content, image, audioUrl, publishedAt, status, featured, views, like, authorId, category, tags)
 const defaultFormState = {
+  id:"",
   title: "",
   slug: "",
   excerpt: "",
@@ -35,6 +36,7 @@ const defaultFormState = {
 
 export default function EditArticlePage({data}:{data:any}) {
   const [formData, setFormData] = useState({ 
+    id:data.id,
     title: data?.title,
     slug: data?.slug,
     excerpt: data?.excerpt,
@@ -47,8 +49,8 @@ export default function EditArticlePage({data}:{data:any}) {
     views: data?.views,
     like: data?.likes,
     authorId: data?.authorId,
-    category: data?.category,
-    subcategory:data?.category,
+    category: data?.category ? (Array.isArray(data.category) ? data.category : Array.isArray(typeof data.category === "string" && data.category.startsWith("[") ? JSON.parse(data.category) : [data.category]) ? (typeof data.category === "string" ? JSON.parse(data.category) : data.category) : []) : [],
+    subcategory: data?.subcategory ? (Array.isArray(data.subcategory) ? data.subcategory : Array.isArray(typeof data.subcategory === "string" && data.subcategory.startsWith("[") ? JSON.parse(data.subcategory) : [data.subcategory]) ? (typeof data.subcategory === "string" ? JSON.parse(data.subcategory) : data.subcategory) : []) : [],
     tags: data?.tags
    });
   const [showPreview, setShowPreview] = useState(false);
@@ -251,6 +253,7 @@ export default function EditArticlePage({data}:{data:any}) {
       // Prepare payload according to schema fields
 
       const articlePayload: Record<string, any> = {
+        id: formData.id,
         title: formData.title,
         slug: formData.slug,
         excerpt: formData.excerpt || "",
@@ -265,7 +268,7 @@ export default function EditArticlePage({data}:{data:any}) {
         like: Number(formData.like) || 0,
         authorId: formData.authorId,
         userId: formData.authorId,
-        category: formData.subcategory ? JSON.stringify(formData.subcategory) : "",
+        category: formData.subcategory ? JSON.stringify(formData.category) : "",
         subcategory: formData.subcategory ? JSON.stringify(formData.subcategory) : "",
         tags: formData.tags || "",
       };
@@ -289,14 +292,15 @@ export default function EditArticlePage({data}:{data:any}) {
       let res: Response;
       try {
         const fd = new FormData();
+        fd.append("id", formData.id); // Tambahkan id dari formData.id
         Object.entries(articlePayload).forEach(([key, value]) => {
-          if (value !== undefined) {
+          if (key !== "id" && value !== undefined) { // Hindari duplikasi id
             fd.append(key, value === null ? "" : value);
           }
         });
 
         res = await fetch("/api/article", {
-          method: "POST",
+          method: "PUT",
           body: fd,
         });
       } catch (fetchError) {
@@ -486,17 +490,22 @@ export default function EditArticlePage({data}:{data:any}) {
                               }
                               onChange={(e) => {
                                 const checked = e.target.checked;
-                                let newSub: string[] = Array.isArray(formData.subcategory)
-                                  ? formData.subcategory.map(String)
-                                  : [];
                                 const subStr = String(sub);
+
+                                let newSub: string[] = [];
+
                                 if (checked) {
-                                  if (!newSub.includes(subStr)) {
-                                    newSub.push(subStr);
-                                  }
+                                  // Ketika subcategory di-check (ditambah)
+                                  newSub = Array.isArray(formData.subcategory) 
+                                    ? [...formData.subcategory.filter((v: string) => v !== subStr), subStr] // Tambah sub, pastikan tidak dobel
+                                    : [subStr];
                                 } else {
-                                  newSub = newSub.filter((v) => v !== subStr);
+                                  // Ketika subcategory di-uncheck (dihapus)
+                                  newSub = Array.isArray(formData.subcategory)
+                                    ? formData.subcategory.filter((v: string) => v !== subStr)
+                                    : [];
                                 }
+
                                 setFormData({ ...formData, subcategory: newSub });
                               }}
                               className="accent-primary h-4 w-4 rounded border-gray-300"

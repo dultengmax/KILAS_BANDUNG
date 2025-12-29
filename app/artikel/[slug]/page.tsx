@@ -225,7 +225,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               article.category.map((cat: any, idx: number) => (
                 <Link
                   key={cat + idx}
-                  href={`/kategori/${typeof cat === "string" ? cat.toLowerCase() : cat}`}
+                  href={`/kategori/${category.find((item: any) => item.id === Number(cat))?.name }`}
                   className="hover:text-primary"
                 >
                   {category.find((item: any) => item.id === Number(cat))?.name }
@@ -344,7 +344,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 {latestArticles.map((news: any, idx: number) => (
                   <li key={news.slug || idx} className="px-6 py-4 hover:bg-muted/40 transition">
                     <Link href={`/artikel/${news.slug}`} className="flex gap-3 items-center group">
-                      <div className="flex-shrink-0 w-12 h-12 rounded bg-gray-200 overflow-hidden relative">
+                      <div className="shrink-0 w-12 h-12 rounded bg-gray-200 overflow-hidden relative">
                         {news.featuredImage && (
                           <Image
                             src={news.featuredImage}

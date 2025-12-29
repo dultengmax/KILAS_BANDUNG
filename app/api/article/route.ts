@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createArticle } from "@/lib/action/article";
+import { createArticle, updateArticle } from "@/lib/action/article";
 
 export async function POST(request: Request) {
   try {
@@ -20,35 +20,48 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
-    // Untuk update artikel, terima formData atau json body.
-    // Misal body JSON: { id, ...fields }
-    let body;
-    const contentType = request.headers.get('content-type');
-    if (contentType?.includes('application/json')) {
-      body = await request.json();
-    } else if (contentType?.includes('multipart/form-data')) {
-      // Untuk multer/form-data: harus parsing lain (optional) - non-prioritas.
-      body = await request.formData();
+    let data: any = undefined;
+    let isFormData = false;
+
+    const contentType = request.headers.get("content-type");
+
+    if (contentType && contentType.includes("multipart/form-data")) {
+      data = await request.formData();
+      isFormData = true;
+    } else if (contentType && contentType.includes("application/json")) {
+      data = await request.json();
     } else {
-      body = await request.json();
+      try {
+        data = await request.json();
+      } catch {
+        return NextResponse.json(
+          { success: false, error: "Request body tidak dikenali" },
+          { status: 400 }
+        );
+      }
     }
 
-    // Panggil fungsi updateArticle (buat di lib/action/article jika belum ada)
-    // Harus ada id!
-    if (!body.id) {
-      return NextResponse.json({ success: false, error: "ID artikel diperlukan" }, { status: 400 });
+    // pastikan id ada
+    // Untuk FormData, cek id dari FormData
+    const idValue = isFormData ? data.get("id") : data?.id;
+    if (!idValue) {
+      return NextResponse.json(
+        { success: false, error: "ID artikel diperlukan" },
+        { status: 400 }
+      );
     }
 
-    // Asumsi updateArticle(body) mengembalikan { success, article?, error? }
-    // Perlu import/updateArticle jika belum (tamba hkan di /lib/action/article)
-    // Supaya tidak error, pakai dynamic import
-    const { updateArticle } = await import('@/lib/action/article');
+    // Jalankan updateArticle sesuai tipe data
+    // updateArticle diharapkan menerima FormData atau JSON, bukan dicampur
+    const result = await updateArticle(data);
 
-    const result = await updateArticle(body);
     if (result.success) {
       return NextResponse.json({ success: true, article: result.article });
     } else {
-      return NextResponse.json({ success: false, error: result.error }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: result.error },
+        { status: 400 }
+      );
     }
   } catch (error: any) {
     return NextResponse.json(

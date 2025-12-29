@@ -188,6 +188,17 @@ export async function loginUser(formData: FormData) {
       maxAge: 7 * 24 * 60 * 60, // 7 days
       path: "/",
     });
+    // Set cookie 'role' hanya jika user.role bertipe string (tidak null)
+    if (typeof user.role === "string") {
+      const cookieRole = await cookies();
+      cookieRole.set("role", user.role, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 7 * 24 * 60 * 60, // 7 days
+        path: "/",
+      });
+    }
+
     return { success: true, message: "Login berhasil" };
   } catch (error: any) {
     return { success: false, message: error.message || "Terjadi kesalahan saat login." };

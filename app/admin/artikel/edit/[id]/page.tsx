@@ -9,8 +9,6 @@ const page = async ({params}:{params:Promise<{id:number}>}) => {
   const data = await getArticleById(id)
   return (
     <div>
-      tes
-      {data?.article?.id}
     <EditPages data={data?.article} />
     </div>
   )
