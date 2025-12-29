@@ -63,18 +63,28 @@ const Page = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-600 to-indigo-900">
+    <div
+      className="min-h-screen flex items-center justify-center relative"
+      style={{
+        backgroundImage: `url('https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=1600&q=80')`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat"
+      }}
+    >
+      {/* Overlay for darker and colorful effect */}
+      <div className="absolute inset-0 bg-linear-to-br from-blue-800/80 via-indigo-900/70 to-indigo-700/70 z-0" />
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md"
+        className="relative z-10 bg-white/90 rounded-xl shadow-2xl p-8 w-full max-w-md backdrop-blur-md"
       >
         <motion.h2
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3, duration: 0.6 }}
-          className="text-3xl font-bold text-center text-indigo-700 mb-6"
+          className="text-3xl font-bold text-center text-indigo-700 mb-6 drop-shadow"
         >
           Login to Your Account
         </motion.h2>
@@ -91,7 +101,7 @@ const Page = () => {
               id="email"
               name="email"
               autoComplete="email"
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white/80"
               placeholder="Enter your email"
               required
             />
@@ -109,7 +119,7 @@ const Page = () => {
               name="password"
               autoComplete="current-password"
               minLength={6}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white/80"
               placeholder="Enter your password"
               required
             />
