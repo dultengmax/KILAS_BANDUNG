@@ -21,7 +21,7 @@ type CategoryPrisma = {
 
 export default async function CategoryPage({ params }: { params: { slug: string } }) {
   // Slug here refers to the category name (lowercased with possible dashes)
-  const { slug } = params;
+  const { slug } = await params;
   const categories: CategoryPrisma[] = await getCategories();
 
   // Convert category names to slug to match route param (handle spaces/dashes)
