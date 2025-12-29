@@ -331,7 +331,7 @@ export default async function HomePage() {
 									PRSSNI
 								</h2>
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-									{latestArticles?.map((article) => (
+									{latestArticles?.map((article:any) => (
 										<ArticleCard key={article.id} data={article} />
 									))}
 								</div>
