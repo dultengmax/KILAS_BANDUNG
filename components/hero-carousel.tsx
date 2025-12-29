@@ -120,14 +120,16 @@ export function HeroCarousel({ articles,category, autoScrollInterval = 5000 }: H
             </motion.div>
 
             {/* Title */}
-            <motion.h1
+            <motion.a
+              href={`/artikel/${currentArticle.slug}`}
               className="text-2xl md:text-3xl lg:text-5xl font-bold text-white mb-4 leading-tight line-clamp-3 drop-shadow-lg"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15, duration: 0.5 }}
+              tabIndex={0}
             >
               {currentArticle.title}
-            </motion.h1>
+            </motion.a>
 
             {/* Excerpt */}
             <motion.p

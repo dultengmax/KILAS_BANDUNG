@@ -14,7 +14,7 @@ export function ArticleCard({data}:{data:any }){
           <div className="relative h-28 w-28 md:h-48 md:w-full shrink-0 rounded-l-lg md:rounded-none md:rounded-t-lg overflow-hidden">
             <Image
               src={data?.featuredImage || "/placeholder.svg"}
-              alt={data?.title}
+              alt={data?.title || "alternative"}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-300 md:rounded-t-lg"
               sizes="(max-width: 768px) 115px, (max-width: 1200px) 50vw, 33vw"
