@@ -1,7 +1,7 @@
 "use server"
 
+import { revalidatePath } from "next/cache";
 import {prisma} from "../prisma";
-
 
 
 // CREATE AboutUs
@@ -88,6 +88,8 @@ export async function updateAboutUs(id: number, data: {
         ...data,
       }
     });
+    revalidatePath("/admin");
+    revalidatePath(`/`);
     return { success: true, data: about };
   } catch (error) {
     return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
