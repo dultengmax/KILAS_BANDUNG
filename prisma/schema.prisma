@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client"
-  output       = "../generated/prisma"
+  output       = "./src/generated/prisma"
 }
 
 // The 'url' and 'directUrl' properties are deprecated in Prisma schema files as of v5.13+.
