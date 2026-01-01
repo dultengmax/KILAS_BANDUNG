@@ -7,6 +7,9 @@ generator client {
 // Move connection URLs to `prisma.config.ts` instead. See https://pris.ly/d/config-datasource
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+
 }
 
 
