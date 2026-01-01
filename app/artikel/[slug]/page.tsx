@@ -126,49 +126,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 // ========== END METADATA GENERATOR ===============
 
 // Mock data - akan diganti dengan database
-const articlesDatabase: Record<string, any> = {
-  "wali-kota-bandung-infrastruktur-2025": {
-    id: "1",
-    title: "Wali Kota Bandung Luncurkan Program Perbaikan Infrastruktur Sepanjang 2025",
-    slug: "wali-kota-bandung-infrastruktur-2025",
-    excerpt:
-      "Program besar-besaran perbaikan jalan dan utilitas publik akan dimulai bulan depan dengan anggaran Rp 500 Miliar.",
-    category: "Politik",
-    author: "Ahmad Rizki",
-    authorBio: "Jurnalis Senior dengan fokus pada berita pemerintahan dan kebijakan publik di Bandung",
-    publishedAt: "2025-11-28",
-    updatedAt: "2025-11-28",
-    readTime: 6,
-    views: 2345,
-    featuredImage: "/public/bandung-city-infrastructure-modernization.jpg",
-    content: `
-      <h2>Rencana Besar Wali Kota untuk Modernisasi Infrastruktur</h2>
-      <p>Wali Kota Bandung mengumumkan peluncuran program infrastruktur terbesar yang pernah ada dalam lima tahun terakhir. Dengan alokasi anggaran mencapai Rp 500 Miliar, program ini dirancang untuk meningkatkan kualitas hidup warga Bandung.</p>
-      
-      <h3>Fokus Utama Program</h3>
-      <p>Program ini berfokus pada tiga area utama:</p>
-      <ul>
-        <li><strong>Perbaikan Jalan:</strong> 45 km jalan akan direpavasi dengan standar internasional</li>
-        <li><strong>Sistem Drainase:</strong> Pembangunan sistem drainase modern untuk mengurangi genangan air</li>
-        <li><strong>Utilitas Publik:</strong> Peningkatan sistem air bersih dan listrik di seluruh wilayah</li>
-      </ul>
-      
-      <h3>Jadwal Implementasi</h3>
-      <p>Pelaksanaan program akan dibagi menjadi tiga fase:</p>
-      <ul>
-        <li><strong>Fase 1 (Januari - Maret 2025):</strong> Sosialisasi dan persiapan</li>
-        <li><strong>Fase 2 (April - Agustus 2025):</strong> Perbaikan jalan utama dan drainase</li>
-        <li><strong>Fase 3 (September - Desember 2025):</strong> Penyelesaian dan penyempurnaan</li>
-      </ul>
-      
-      <h3>Dampak Bagi Masyarakat</h3>
-      <p>Wali Kota menekankan bahwa program ini akan membawa dampak positif bagi seluruh masyarakat Bandung. Infrastruktur yang lebih baik akan meningkatkan mobilitas, mengurangi kemacetan, dan menciptakan lingkungan yang lebih sehat.</p>
-      
-      <p>"Kami berkomitmen untuk membuat Bandung menjadi kota yang lebih modern dan nyaman untuk ditinggali," ujar Wali Kota dalam konferensi pers yang dihadiri oleh media massa dan stakeholder terkait.</p>
-    `,
-  },
-}
-
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const result = await getArticleBySlug(slug);
