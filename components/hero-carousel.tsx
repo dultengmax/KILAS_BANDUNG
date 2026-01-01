@@ -6,18 +6,7 @@ import Link from "next/link"
 import { ChevronLeft, ChevronRight, Zap } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
-interface CarouselArticle {
-  id: string
-  title: string
-  slug: string
-  excerpt: string
-  featuredImage: string
-  category: string
-  author: string
-  publishedAt: string
-  readTime: number
-  breaking?: boolean
-}
+
 
 interface HeroCarouselProps {
   articles: any
@@ -57,7 +46,7 @@ export function HeroCarousel({ articles,category, autoScrollInterval = 5000 }: H
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }
-  }, [current, isAutoScroll, autoScrollInterval, articles.length])
+  }, [current, isAutoScroll, autoScrollInterval, articles?.length ?? 0])
 
   // Remove old progress bar animation effect, handled by framer-motion now
 
@@ -67,14 +56,14 @@ export function HeroCarousel({ articles,category, autoScrollInterval = 5000 }: H
     <>
       {/* Hero Section */}
       <section
-        className="relative h-96 md:h-[500px] lg:h-[550px] w-full  mx-auto overflow-hidden group"
+        className="relative h-96 md:h-[500px] lg:h-[550px] w-full rounded-sm mx-auto overflow-hidden group"
         onMouseEnter={() => setIsAutoScroll(false)}
         onMouseLeave={() => setIsAutoScroll(true)}
       >
         {/* Image with fade transition */}
         <AnimatePresence mode="wait">
           <motion.div
-            key={currentArticle.featuredImage}
+            key={currentArticle?.featuredImage}
             className="absolute inset-0"
             initial={{ opacity: 0, scale: 1.03 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -82,8 +71,8 @@ export function HeroCarousel({ articles,category, autoScrollInterval = 5000 }: H
             transition={{ duration: 0.7, ease: "easeInOut" }}
           >
             <Image
-              src={currentArticle.featuredImage || "/placeholder.svg"}
-              alt={currentArticle.title}
+              src={currentArticle?.featuredImage || "/placeholder.svg"}
+              alt={currentArticle?.title}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-700"
               priority={current === 0}
@@ -100,7 +89,7 @@ export function HeroCarousel({ articles,category, autoScrollInterval = 5000 }: H
         {/* Hero content */}
         <motion.div
           className="absolute inset-0 flex items-end p-4 md:p-8 lg:p-12"
-          key={currentArticle.id}
+          key={currentArticle?.id}
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 40 }}
@@ -116,19 +105,22 @@ export function HeroCarousel({ articles,category, autoScrollInterval = 5000 }: H
               transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 18 }}
             >
               <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-              {category.find((i:any)=>i.id === currentArticle.category)?.name}
+              {
+              category &&
+              Array.isArray(category) &&
+              category?.find((i:any)=>i.id === currentArticle?.category)?.name || ''}
             </motion.div>
 
             {/* Title */}
             <motion.a
-              href={`/artikel/${currentArticle.slug}`}
+              href={`/artikel/${currentArticle?.slug}`}
               className="text-2xl md:text-3xl lg:text-5xl font-bold text-white mb-4 leading-tight line-clamp-3 drop-shadow-lg"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15, duration: 0.5 }}
               tabIndex={0}
             >
-              {currentArticle.title}
+              {currentArticle?.title}
             </motion.a>
 
             {/* Excerpt */}
@@ -138,7 +130,7 @@ export function HeroCarousel({ articles,category, autoScrollInterval = 5000 }: H
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.22, duration: 0.5 }}
             >
-              {currentArticle.excerpt}
+              {currentArticle?.excerpt}
             </motion.p>
 
             {/* Meta + CTA */}
@@ -149,9 +141,9 @@ export function HeroCarousel({ articles,category, autoScrollInterval = 5000 }: H
               transition={{ delay: 0.3, duration: 0.5 }}
             >
               <div className="flex gap-4 text-white/90 text-sm drop-shadow-md">
-                <span className="font-medium text-xs">{currentArticle.userId}</span>
+                <span className="font-medium text-xs">{currentArticle?.userId}</span>
                 <span>•</span>
-                <span className="text-xs">{new Date(currentArticle.publishedAt).toLocaleDateString("id-ID")}</span>
+                <span className="text-xs">{new Date(currentArticle?.publishedAt).toLocaleDateString("id-ID")}</span>
               </div>
 
             </motion.div>

@@ -1,6 +1,6 @@
 "use server"
 import { z } from "zod";
-import prisma from "../prisma";
+import {prisma} from "../prisma";
 
 // Zod schema for Media
 const mediaSchema = z.object({

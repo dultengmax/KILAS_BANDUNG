@@ -1,6 +1,6 @@
 "use server"
 
-import prisma from "../prisma";
+import {prisma} from "../prisma";
 import { revalidatePath } from "next/cache";
 
 // CREATE
@@ -49,7 +49,7 @@ export async function getCategories() {
   try {
     return await prisma.category.findMany();
   } catch (error: any) {
-    throw new Error("Gagal mengambil data kategori: " + (error.message || error));
+    throw new Error("Gagal mengambil data kategori: " + (error?.message || error));
   }
 }
 

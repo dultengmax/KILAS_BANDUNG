@@ -219,13 +219,16 @@ export default function AdminDashboard({
                 </div>
 
                 <div className="space-y-2">
-                  {category.map((cat:any) => (
+                  {
+                  category &&
+                  Array.isArray(category) &&
+                  category?.map((cat:any) => (
                     <div
-                      key={cat.id}
+                      key={cat?.id}
                       className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50"
                     >
-                      <span className="font-medium text-slate-900 dark:text-white text-sm">{cat.name}</span>
-                      <span className={`px-2 py-1 rounded text-xs font-semibold ${cat.color}`}>{cat.count}</span>
+                      <span className="font-medium text-slate-900 dark:text-white text-sm">{cat?.name}</span>
+                      <span className={`px-2 py-1 rounded text-xs font-semibold ${cat?.color}`}>{cat?.count}</span>
                     </div>
                   ))}
                 </div>
@@ -277,9 +280,9 @@ export default function AdminDashboard({
                   </tr>
                 </thead>
                 <tbody>
-                  {article.map((article:any) => (
+                  {article?.map((article:any) => (
                     <tr
-                      key={article.id}
+                      key={article?.id}
                       className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition"
                     >
                       <td className="py-4 px-4">
@@ -287,32 +290,32 @@ export default function AdminDashboard({
                           {article.title}
                         </p>
                       </td>
-                      <td className="py-4 px-4 text-slate-600 dark:text-slate-400 text-sm">{article.category}</td>
-                      <td className="py-4 px-4 text-slate-600 dark:text-slate-400 text-sm">{article.author}</td>
+                      <td className="py-4 px-4 text-slate-600 dark:text-slate-400 text-sm">{article?.category}</td>
+                      <td className="py-4 px-4 text-slate-600 dark:text-slate-400 text-sm">{article?.author}</td>
                       <td className="py-4 px-4">
                         <span
                           className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                            article.status === "published"
+                            article?.status === "published"
                               ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
-                              : article.status === "draft"
+                              : article?.status === "draft"
                                 ? "bg-slate-100 text-slate-700 dark:bg-slate-600 dark:text-slate-300"
                                 : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
                           }`}
                         >
-                          {article.status === "published"
+                          {article?.status === "published"
                             ? "Dipublikasikan"
                             : article.status === "draft"
                               ? "Draft"
                               : "Terjadwal"}
                         </span>
                       </td>
-                      <td className="py-4 px-4 text-slate-600 dark:text-slate-400 text-sm">{article.date}</td>
+                      <td className="py-4 px-4 text-slate-600 dark:text-slate-400 text-sm">{article?.date}</td>
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-2">
-                          <Link href={`/admin/artikel/edit/${article.id}`}  className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded">
+                          <Link href={`/admin/artikel/edit/${article?.id}`}  className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded">
                             <Edit2 className="w-4 h-4" />
                           </Link >
-<DeleteDialogArticle id={article.id} />
+<DeleteDialogArticle id={article?.id} />
                         </div>
                       </td>
                     </tr>
@@ -332,7 +335,8 @@ export default function AdminDashboard({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {category.map((cat:any) => (
+              {
+              category?.map((cat:any) => (
                 <div
                   key={cat.id}
                   className="p-6 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50 hover:shadow-md transition"
