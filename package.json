@@ -1,9 +1,9 @@
 {
-  "name": "my-v0-project",
-  "version": "0.1.0",
+  "name": "website kilas bandung",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
-    "build": "next build && prisma generate ",
+    "build": "next build ",
     "dev": "next dev",
     "lint": "eslint .",
     "start": "next start",
