@@ -47,7 +47,7 @@ export async function createCategory(formData: FormData) {
 // READ - Get All
 export async function getCategories() {
   try {
-    return await prisma.category.findMany();
+    return await prisma.category.findMany({});
   } catch (error: any) {
     throw new Error("Gagal mengambil data kategori: " + (error?.message || error));
   }
