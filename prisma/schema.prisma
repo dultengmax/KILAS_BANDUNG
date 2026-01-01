@@ -1,14 +1,12 @@
 generator client {
   provider = "prisma-client"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
-  output   = "../generated/prisma"
 }
 
+// The 'url' and 'directUrl' properties are deprecated in Prisma schema files as of v5.13+.
+// Move connection URLs to `prisma.config.ts` instead. See https://pris.ly/d/config-datasource
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-
 }
 
 
