@@ -12,7 +12,7 @@ interface RightSidebarProps {
   trendingArticles: SidebarArticle[]
 }
 
-export function RightSidebar({ trendingArticles }: RightSidebarProps) {
+export function RightSidebar({ trendingArticles }: {trendingArticles:any}) {
   return (
     <aside className="hidden lg:ml-1 2xl:ml-12 lg:block lg:w-80  2xl:w-90 lg:sticky lg:top-20 lg:h-fit">
       <div className="space-y-6">
@@ -24,7 +24,7 @@ export function RightSidebar({ trendingArticles }: RightSidebarProps) {
           </div>
 
           <div className="space-y-4">
-            {trendingArticles.map((article, index) => (
+            {trendingArticles.map((article:any, index:number) => (
               <Link
                 key={article.id}
                 href={`/artikel/${article.slug}`}

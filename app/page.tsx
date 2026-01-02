@@ -349,7 +349,7 @@ export default async function HomePage() {
 
 					{/* Right Sidebar */}
 					<RightSidebar
-						trendingArticles={articles.slice(0, 5).map((a) => ({
+						trendingArticles={dataArticle?.articles?.slice(0, 5).map((a:any) => ({
 							id: a.id,
 							title: a.title,
 							slug: a.slug,
