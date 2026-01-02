@@ -29,3 +29,5 @@ next-env.d.ts
 /generated/prisma
 
 /prisma/lib/generated/prisma
+
+/generated/prisma
