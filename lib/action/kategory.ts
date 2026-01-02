@@ -47,7 +47,31 @@ export async function createCategory(formData: FormData) {
 // READ - Get All
 export async function getCategories() {
   try {
-    return await prisma.category.findMany({});
+    const categories = await prisma.category.findMany({});
+    if (!Array.isArray(categories)) {
+      throw new Error("Data kategori tidak valid.");
+    }
+    return categories.map(cat => {
+      if (
+        !cat ||
+        typeof cat !== "object" ||
+        typeof cat.name !== "string" ||
+        cat.name.trim() === ""
+      ) {
+        throw new Error("Data kategori mengandung entri tidak valid.");
+      }
+      // Validasi subCategory: jika null ubah jadi array kosong, jika bukan array lempar error
+      let subCategory = cat.subCategory;
+      if (subCategory === null || subCategory === undefined) {
+        subCategory = [];
+      } else if (!Array.isArray(subCategory)) {
+        throw new Error("Format subCategory pada kategori tidak valid.");
+      }
+      return {
+        ...cat,
+        subCategory,
+      };
+    });
   } catch (error: any) {
     throw new Error("Gagal mengambil data kategori: " + (error?.message || error));
   }
