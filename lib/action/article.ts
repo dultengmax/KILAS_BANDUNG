@@ -1,7 +1,7 @@
 "use server"
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-  import {prisma} from "../prisma";
+  import prisma from "../prisma";
 
 // Zod schema for Article input validation (with string/array normalization for FormData)
 const articleSchemaForFormData = z.object({

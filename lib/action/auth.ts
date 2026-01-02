@@ -3,7 +3,7 @@
 import { cookies } from "next/headers"
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import {prisma} from "../prisma";
+import prisma from "../prisma";
 import { revalidatePath } from "next/cache";
 
 const JWT_SECRET = process.env.JWT_SECRET || "default_secret";
