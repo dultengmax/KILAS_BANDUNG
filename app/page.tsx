@@ -54,15 +54,15 @@ export default async function HomePage() {
 					<div className="md:grid grid-cols-1 hidden gap-1">
 						{sideHeroes?.map((article: any, idx: number) => (
 							<Link
-								key={article.id}
-								href={`/artikel/${article.slug}`}
+								key={article?.id}
+								href={`/artikel/${article?.slug}`}
 								className="group flex flex-col bg-card dark:bg-card hover:shadow-lg dark:hover:shadow-xl transition-all duration-300  overflow-hidden border border-border dark:border-border hover:border-primary/50 dark:hover:border-secondary/50 smooth-transition"
 							>
 								{/* Image Container */}
 								<div className="relative h-full md:h-full overflow-hidden bg-muted dark:bg-muted">
 									<Image
-										src={article.featuredImage || "/placeholder.svg"}
-										alt={article.title}
+										src={article?.featuredImage || "/placeholder.svg"}
+										alt={article?.title}
 										fill
 										className="object-cover group-hover:scale-110 transition-transform duration-500"
 										sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -76,9 +76,9 @@ export default async function HomePage() {
 									<div className="absolute w-full space-y-2 gap-2 bottom-3 left-3 right-3">
 										<h3
 											className="text-lg truncate font-semibold text-white mb-3 line-clamp-2 "
-											title={article.title}
+											title={article?.title}
 										>
-											{article.title}
+											{article.title  || ""}
 										</h3>
 										<span className="text-xs mt-2 text-white absolute bottom-0 text">
 											{new Date(article.publishedAt).toLocaleDateString("id-ID")}
