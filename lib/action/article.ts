@@ -117,7 +117,9 @@ export async function createArticle(formData: FormData) {
         },
       },
     });
-
+revalidatePath("/admin");
+revalidatePath("/");
+revalidatePath("/kategori");
     return { success: true, article };
   } catch (error: any) {
     return { success: false, error: error.message || error };
@@ -213,6 +215,9 @@ export async function updateArticle(input: FormData) {
       where: { id },
       data: finalUpdate,
     });
+
+    revalidatePath("/admin");
+    revalidatePath("/");
 
     return { success: true, article };
   } catch (error: any) {

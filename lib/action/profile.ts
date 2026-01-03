@@ -41,6 +41,7 @@ import prisma from "../prisma";
 // }
 
 // READ ALL AboutUs
+
 export async function getAllAboutUs() {
   try {
     const abouts = await prisma.aboutUs.findMany({
@@ -88,6 +89,7 @@ export async function updateAboutUs(id: number, data: {
         ...data,
       }
     });
+    
     revalidatePath("/admin");
     revalidatePath(`/`);
     return { success: true, data: about };
