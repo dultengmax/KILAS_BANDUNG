@@ -29,7 +29,7 @@ export default async function HomePage({
 		<>
 			<Times />
 			<main className="min-h-screen bg-background dark:bg-background smooth-transition">
-				<Header post={posts}/>
+				<Header/>
 				<RunningNewsTicker dataArticle={dataArticle} />
 
 				<section className="w-full md:w-7xl mx-auto justify-center gap-2 grid grid-cols-1 md:grid-cols-4 md:mt-3">

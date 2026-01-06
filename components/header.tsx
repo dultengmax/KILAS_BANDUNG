@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { getCategories } from "@/lib/action/kategory"
 import SearchBar from "./searchbar"
 
-export function Header({post}:{post:any}) {
+export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [category,setCategory] = useState<any>([])
