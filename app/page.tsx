@@ -13,16 +13,11 @@ import { Suspense } from "react"
 
 
 
-export default async function HomePage({
-	searchParams,
-  }: {
-	searchParams?: { query?: string };
-  }) {
+export default async function HomePage(
+) {
 	const dataArticle = await getArticles()
 	const categoryName = await getCategories()
 	const latestArticles = dataArticle?.articles?.slice(1)
-    const query = searchParams?.query || '';
-    const posts = await searchArticles(query);
 	const news = dataArticle?.articles?.slice(0, 6)
 	const sideHeroes = dataArticle?.articles?.slice(0, 3)
 	return (

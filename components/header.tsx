@@ -79,10 +79,9 @@ export function Header() {
             className="hidden md:flex items-center gap-6"
           >
             {/* Search Bar */}
-            <div className="flex flex-col">
+            {/* <div className="flex flex-col">
               <SearchBar />
-            </div>
-            {/* Theme Toggle */}
+            </div> */}
             <ThemeToggle />
           </motion.div>
 
