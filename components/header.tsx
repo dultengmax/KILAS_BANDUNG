@@ -2,15 +2,34 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Menu, X, Search } from "lucide-react"
 import { ThemeToggle } from "./theme-toggle"
 import { motion, AnimatePresence } from "framer-motion"
+import { getCategories } from "@/lib/action/kategory"
+import SearchBar from "./searchbar"
 
-export function Header() {
+export function Header({post}:{post:any}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [category,setCategory] = useState<any>([])
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesData = await getCategories();
+        setCategory(categoriesData);
+      } catch (error) {
+        // Optionally handle error (e.g., console.error(error))
+        setCategory([]);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+
 
   const categories = [
     { name: "Politik", slug: "politik" },
@@ -57,21 +76,13 @@ export function Header() {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 20 }}
-            className="hidden md:flex items-center gap-4"
+            className="hidden md:flex items-center gap-6"
           >
-            <form
-              onSubmit={handleSearch}
-              className="flex items-center gap-2 bg-background dark:bg-popover rounded-lg px-3 py-2 border border-border dark:border-border smooth-transition focus-within:ring-2 focus-within:ring-primary/50"
-            >
-              <Search className="w-4 h-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Cari berita..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent outline-none text-sm w-48 text-foreground placeholder-muted-foreground dark:placeholder-muted-foreground"
-              />
-            </form>
+            {/* Search Bar */}
+            <div className="flex flex-col">
+              <SearchBar />
+            </div>
+            {/* Theme Toggle */}
             <ThemeToggle />
           </motion.div>
 
@@ -99,15 +110,15 @@ export function Header() {
           <Link href="/" className="font-medium hover:text-primary transition-colors smooth-transition">
             Beranda
           </Link>
-          {categories.map((cat, i) => (
+          {category.map((cat:any, i:number) => (
             <motion.div
-              key={cat.slug}
+              key={cat.i}
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.45 + i * 0.05, type: "spring", stiffness: 200, damping: 20 }}
             >
               <Link
-                href={`/kategori/${cat.slug}`}
+                href={`/kategori/${cat.name}`}
                 className="font-medium hover:text-primary transition-colors smooth-transition"
               >
                 {cat.name}
@@ -189,25 +200,34 @@ type RunningNewsTickerProps = {
 
 export function RunningNewsTicker({ dataArticle }: {dataArticle:any}) {
   return (
-    <div className="max-w-6xl mx-auto bg-primary/90 dark:bg-secondary/90 py-4 overflow-hidden">
-      <div className="flex items-center gap-3">
-        <span className="ml-4 text-white font-semibold text-xs md:text-sm shrink-0">
-          🟢 Berita Terkini:
-        </span>
+    <div className="max-w-7xl mx-auto bg-primary/90 dark:bg-secondary/90 md:rounded-b-md overflow-hidden">
+      <div className="flex items-center gap-0">
+        <div className="h-full w-40 md:w-44 bg-red-600 py-3 md:py-2 rounded-r-lg flex items-center justify-start">
+          <span className="ml-2 md:ml-4 px-2 md:px-3 rounded text-white font-bold text-xs md:text-lg shrink-0 flex items-center animate-pulse select-none">
+          Breaking News
+          </span>
+        </div>
         <div className="relative flex-1 overflow-hidden">
+          {/* Gradient overlay left */}
           <div
-            className="whitespace-nowrap animate-marquee text-white text-xs md:text-sm font-medium"
+            aria-hidden="true"
+            className="absolute top-0 left-0 h-full w-10 pointer-events-none z-10"
             style={{
-              animation: "marquee 25s linear infinite"
+              background: "linear-gradient(to right, var(--color-primary, #f04d4d) 80%, transparent)"
+            }}
+          />
+          {/* Gradient overlay right - optional for nicer edge */}
+          <div
+            className="whitespace-nowrap py-3 text-white text-xs md:text-sm font-medium animate-marquee"
+            style={{
+              animation: "marquee 24s linear infinite"
             }}
           >
-            {dataArticle.articles
-              ?.slice(0, 10)
-              .map((berita: any, idx: number) => (
-                <span key={berita.id} className="mr-8">
-                  {berita.title}
-                </span>
-              ))}
+            {dataArticle.articles?.slice(0, 10).map((berita: any, idx: number) => (
+              <span key={berita.id} className="mr-10 md:mr-14 font-semibold inline-block">
+                {berita.title}
+              </span>
+            ))}
           </div>
         </div>
       </div>

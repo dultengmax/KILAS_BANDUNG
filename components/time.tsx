@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 
 const dayNames = [
   'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'
@@ -10,12 +10,16 @@ const monthNames = [
 ];
 
 const Times = () => {
-  const [now, setNow] = useState(new Date());
+  const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  if (typeof window === 'undefined') {
+    return null; // Prevent hydration mismatch by not rendering on the server
+  }
 
   const day = dayNames[now.getDay()];
   const date = now.getDate();
@@ -26,12 +30,12 @@ const Times = () => {
   const seconds = now.getSeconds().toString().padStart(2, '0');
 
   return (
-    <div>
+    <>
       <div className="w-full h-10 bg-blue-950 flex items-center justify-center text-white font-semibold text-xs tracking-wide">
         {`${day}, ${date} ${month} ${year} | ${hours}:${minutes}:${seconds}`}
       </div>
-    </div>
-  )
-}
+    </>
+  );
+};
 
-export default Times
+export default Times;

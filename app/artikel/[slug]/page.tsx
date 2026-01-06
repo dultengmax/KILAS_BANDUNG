@@ -234,10 +234,6 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               </span>
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <Clock className="w-4 h-4" />
-              <span>{article.readTime} min baca</span>
-            </div>
 
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <Eye className="w-4 h-4" />
@@ -248,7 +244,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           </div>
 
           {/* Featured Image */}
-          <div className="relative w-full h-96 md:h-[500px] rounded-lg overflow-hidden mb-8">
+          <div className="relative w-full h-96 md:h-500px rounded-lg overflow-hidden mb-8">
             <Image
               src={article?.image || ""}
               alt={article.title}
@@ -258,6 +254,17 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               priority
             />
           </div>
+          <p>{article.excerpt}</p>
+
+          {/* Audio Component */}
+          {article.audio && (
+            <div className="mb-8">
+              <audio controls className="w-full">
+                <source src={article.audio} type="audio/mpeg" />
+                Your browser does not support the audio element.
+              </audio>
+            </div>
+          )}
 
           {/* Article Content */}
           <div className="prose dark:prose-invert prose-lg max-w-none mb-12">

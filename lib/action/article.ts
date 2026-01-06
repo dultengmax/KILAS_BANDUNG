@@ -297,3 +297,73 @@ export async function getArticles(params = {}) {
     return { success: false, error: error.message || error };
   }
 }
+
+/**
+ * Efficient article search using Prisma.
+ * Performs a case-insensitive search on title, excerpt, and author.
+ * Supports pagination for scalability. Returns array of articles (limit default: 10).
+ * 
+ * @param {string} query - The search string to find in articles.
+ * @param {object} [options] - Optional: { skip: number, take: number }
+ * @returns {Promise<{success: boolean, articles?: any[], count?: number, error?: string}>}
+ */
+export async function searchArticles(
+  query: string,
+  options: { skip?: number; take?: number } = {}
+) {
+  try {
+    if (!query || typeof query !== "string" || query.trim().length < 2) {
+      return {
+        success: false,
+        articles: [],
+        count: 0,
+        error: "Masukkan kata kunci pencarian yang valid.",
+      };
+    }
+
+    const { skip = 0, take = 10 } = options;
+
+    // Prisma's QueryMode type is 'default' | 'insensitive'
+    // Type-safe usage
+    const queryMode: "insensitive" = "insensitive";
+    const where = {
+      OR: [
+        { title: { contains: query, mode: queryMode } },
+        { excerpt: { contains: query, mode: queryMode } },
+        { author: { contains: query, mode: queryMode } },
+        // Uncomment the following line if your Prisma schema includes 'content'
+        // { content: { contains: query, mode: queryMode } },
+      ],
+      status: "published"
+    };
+
+    const [articles, count] = await Promise.all([
+      prisma.article.findMany({
+        where: where,
+        orderBy: { publishedAt: "desc" },
+        skip,
+        take,
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          excerpt: true,
+          featuredImage: true,
+          publishedAt: true,
+          author: true,
+          category: true,
+          readTime: true,
+          views: true,
+        },
+      }),
+      prisma.article.count({
+        where: where,
+      }),
+    ]);
+
+    return { success: true, articles, count };
+  } catch (error: any) {
+    return { success: false, error: error?.message || "Gagal melakukan pencarian." };
+  }
+}
+
