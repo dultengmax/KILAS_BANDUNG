@@ -210,11 +210,11 @@ export function HeroCarousel({ articles,category, autoScrollInterval = 5000 }: H
 
 
 
-export function HeroCarousel2({ sideHeroes }: { sideHeroes: any}) {
-  // Show 1 card per page
-  const CARDS_PER_ROW = 1;
+export function HeroCarousel2({ sideHeroes }: { sideHeroes: any }) {
+  // Show 3 cards per page, stacked vertically
+  const CARDS_PER_PAGE = 3;
   const total = sideHeroes?.length || 0;
-  const maxPage = total > 0 ? Math.ceil(total / CARDS_PER_ROW) : 0;
+  const maxPage = total > 0 ? Math.ceil(total / CARDS_PER_PAGE) : 0;
 
   const [page, setPage] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -244,8 +244,8 @@ export function HeroCarousel2({ sideHeroes }: { sideHeroes: any}) {
 
   const getShownArticles = () => {
     if (!sideHeroes) return [];
-    const start = page * CARDS_PER_ROW;
-    return sideHeroes.slice(start, start + CARDS_PER_ROW);
+    const start = page * CARDS_PER_PAGE;
+    return sideHeroes.slice(start, start + CARDS_PER_PAGE);
   };
 
   return (
@@ -269,14 +269,15 @@ export function HeroCarousel2({ sideHeroes }: { sideHeroes: any}) {
             className="absolute top-0 left-0 w-full h-full"
             style={{ zIndex: 20 }}
           >
-            <div className="grid grid-cols-1 h-full gap-2">
+            <div className="grid grid-rows-3 h-full gap-2">
               {getShownArticles()?.map((article: any, idx: number) => (
                 <Link
                   key={article?.id || idx}
                   href={`/artikel/${article?.slug}`}
-                  className="group flex flex-col h-1/3 bg-card dark:bg-card hover:shadow-lg dark:hover:shadow-xl transition-all duration-300 overflow-hidden border border-border dark:border-border hover:border-primary/50 dark:hover:border-secondary/50 smooth-transition rounded-2xl flex-1"
+                  className="group flex flex-col bg-card dark:bg-card hover:shadow-lg dark:hover:shadow-xl transition-all duration-300 overflow-hidden border border-border dark:border-border hover:border-primary/50 dark:hover:border-secondary/50 smooth-transition rounded-2xl"
+                  style={{ minHeight: 0 }}
                 >
-                  <div className="relative h-full rounded-2xl overflow-hidden bg-muted dark:bg-muted">
+                  <div className="relative h-36 md:h-40 rounded-2xl overflow-hidden bg-muted dark:bg-muted">
                     <Image
                       src={article?.featuredImage || "/placeholder.svg"}
                       alt={article?.title || "Thumbnail"}
@@ -288,33 +289,35 @@ export function HeroCarousel2({ sideHeroes }: { sideHeroes: any}) {
                     <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/30 to-black/75 pointer-events-none" />
                     {/* Index badge */}
                     <div className="absolute top-3 left-3 bg-primary dark:bg-secondary text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
-                      {"k"}
+                      {page * CARDS_PER_PAGE + idx + 1}
                     </div>
+                    <div className="absolute bottom-0 left-0 right-0 px-4 pb-3 flex flex-col justify-end min-h-[72px] z-10">
+                      <h3
+                        className="text-base truncate font-semibold text-white mb-2 line-clamp-2"
+                        title={article?.title}
+                      >
+                        {article?.title || ""}
+                      </h3>
+                      <span className="text-xs mt-2 text-white self-end">
+                        {article?.publishedAt ? new Date(article.publishedAt).toLocaleDateString("id-ID") : ""}
+                      </span>
+                    </div>
+                
                   </div>
                   {/* Article Info */}
-                  <div className="flex-1 flex flex-col justify-end px-4 pb-3 relative">
-                    <h3
-                      className="text-lg truncate font-semibold text-white mb-3 line-clamp-2"
-                      title={article?.title}
-                    >
-                      {article?.title || ""}
-                    </h3>
-                    <span className="text-xs mt-2 text-white absolute bottom-2 right-4">
-                      {article?.publishedAt ? new Date(article.publishedAt).toLocaleDateString("id-ID") : ""}
-                    </span>
-                  </div>
+
                 </Link>
               ))}
-              {/* Empty slot for layout alignment if needed */}
+              {/* Empty slots if less than 3 on last page */}
               {(() => {
-                const _shown = getShownArticles();
-                const fill = CARDS_PER_ROW - _shown.length;
+                const shown = getShownArticles();
+                const fill = CARDS_PER_PAGE - shown.length;
                 return fill > 0
                   ? Array.from({ length: fill }).map((_, i) => (
                       <div
                         key={`empty-${i}`}
-                        className="flex-1 rounded-2xl"
-                        style={{ opacity: 0 }}
+                        className="rounded-2xl"
+                        style={{ opacity: 0, minHeight: 0 }}
                       ></div>
                     ))
                   : null;

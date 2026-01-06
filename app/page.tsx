@@ -74,7 +74,7 @@ export default async function HomePage(
 						))}
 					</div>
 				}>
-					<div className="grid grid-cols-2 max-w-7xl mx-auto pt-3 md:grid-cols-3 gap-5">
+					<div className="grid grid-cols-2 max-w-7xl mx-auto pt-3 md:grid-cols-3 mt-7 gap-5">
 						{news?.map((article: any, idx: number) => (
 							<Link
 								key={article.id}
