@@ -165,15 +165,15 @@ export default async function HomePage({
 									<div className="grid grid-cols-2 md:grid-cols-3 gap-5">
 										{news?.map((article: any, idx: number) => (
 											<Link
-												key={article.id}
-												href={`/artikel/${article.slug}`}
+												key={article?.id}
+												href={`/artikel/${article?.slug}`}
 												className="group flex flex-col bg-card dark:bg-card hover:shadow-lg dark:hover:shadow-xl transition-all duration-300 rounded-lg overflow-hidden border border-border dark:border-border hover:border-primary/50 dark:hover:border-secondary/50 smooth-transition"
 											>
 												{/* Image Container */}
 												<div className="relative h-40 md:h-48 overflow-hidden bg-muted dark:bg-muted">
 													<Image
-														src={article.featuredImage || "/placeholder.svg"}
-														alt={article.title}
+														src={article?.featuredImage || "/placeholder.svg"}
+														alt={article?.title}
 														fill
 														className="object-cover group-hover:scale-110 transition-transform duration-500"
 														sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
