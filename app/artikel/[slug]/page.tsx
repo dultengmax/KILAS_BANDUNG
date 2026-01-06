@@ -192,8 +192,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               <p></p>
             )}
             <span>/</span>
-            <span className="text-gray-900 dark:text-white font-medium truncate max-w-xs md:max-w-lg text-wrap line-clamp-2" title={article.title}>
-              {article.title}
+            <span
+              className="text-gray-900 dark:text-white font-medium truncate max-w-xs md:max-w-lg overflow-hidden whitespace-nowrap"
+              title={article.title}
+            >
+              {article?.title}
             </span>
           </div>
 
@@ -291,8 +294,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           <section className="mb-12">
             <h2 className="text-2xl font-bold mb-6 text-foreground">Artikel Terkait</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {relatedArticles?.map((relatedArticle: any, index: number) => (
-                <ArticleCard key={index} {...relatedArticle} />
+              {allArticles?.map((relatedArticle: any, index: number) => (
+                <ArticleCard key={index} data={relatedArticle} />
               ))}
             </div>
           </section>
